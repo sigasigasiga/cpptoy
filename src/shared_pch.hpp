@@ -31,6 +31,10 @@
 #include <utility>
 #include <variant>
 
+#ifdef __cpp_lib_ranges
+#include <ranges>
+#endif // __cpp_lib_ranges
+
 // thirdparty
 #include <fmt/core.h>
 #include <range/v3/all.hpp>
