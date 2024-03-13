@@ -1,6 +1,6 @@
 project('toy', 'cpp', default_options : [ 'cpp_std=c++23' ])
 
-boost_dep = dependency('boost')
+boost_dep = dependency('boost', required: false)
 fmt_dep = dependency('fmt')
 ranges_dep = dependency('range-v3')
 
