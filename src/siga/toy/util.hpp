@@ -61,4 +61,11 @@ public:
     -> decltype(auto)                                                          \
     { return X(std::forward<Args>(args)...); }
 
+#define SIGA_TOY_LIFT_MEM_FN(METHOD)                                           \
+    []<typename Object, typename... Args>                                      \
+    (Object &&object, Args &&...args) constexpr                                \
+    noexcept(noexcept(std::declval<Object>().METHOD(std::declval<Args>()...))) \
+    -> decltype(auto)                                                          \
+    { return std::forward<Object>(object).METHOD(std::forward<Args>(args)...); }
+
 // clang-format on
