@@ -1,3 +1,5 @@
+#pragma once
+
 namespace siga::util {
 
 template<typename F>
