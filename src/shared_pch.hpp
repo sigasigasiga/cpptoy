@@ -40,4 +40,5 @@
 #include <range/v3/all.hpp>
 
 // my includes
-#include "siga/toy/util.hpp"
+#include "siga/util/functional.hpp"
+#include "siga/util/toy.hpp"

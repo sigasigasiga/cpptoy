@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace siga::toy {
+namespace siga::util {
 
 template<typename>
 struct type_print_t;
@@ -51,17 +51,17 @@ public:
     }
 };
 
-} // namespace siga::toy
+} // namespace siga::util
 
 // clang-format off
 
-#define SIGA_TOY_LIFT(X)                                                       \
+#define SIGA_UTIL_LIFT(X)                                                      \
     []<typename... Args>(Args &&...args) constexpr                             \
     noexcept(noexcept(X(std::forward<Args>(args)...)))                         \
     -> decltype(auto)                                                          \
     { return X(std::forward<Args>(args)...); }
 
-#define SIGA_TOY_LIFT_MEM_FN(METHOD)                                           \
+#define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                          \
     []<typename Object, typename... Args>                                      \
     (Object &&object, Args &&...args) constexpr                                \
     noexcept(noexcept(std::declval<Object>().METHOD(std::declval<Args>()...))) \
