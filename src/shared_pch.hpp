@@ -43,4 +43,5 @@
 // my includes
 #include "siga/util/functional.hpp"
 #include "siga/util/iterator.hpp"
+#include "siga/util/meta.hpp"
 #include "siga/util/toy.hpp"
