@@ -13,7 +13,7 @@ fmt_dep = dependency('fmt')
 ranges_dep = dependency('range-v3')
 
 sources = [
-  'src/main.cpp',
+  'src/app.cpp',
 ]
 
 executable(
