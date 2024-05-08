@@ -27,7 +27,9 @@
 #include <iterator>
 #include <memory>
 #include <optional>
-#include <print>
+#if __has_include(<print>)
+#    include <print>
+#endif
 #include <ranges>
 #include <stdexcept>
 #include <thread>
