@@ -49,8 +49,7 @@ public:
 class ignore_t
 {
 public:
-    constexpr ignore_t &operator=(auto &&) noexcept { return *this; }
-    constexpr void operator()(auto &&...) noexcept {}
+    constexpr void operator()(auto &&...) const noexcept {}
 };
 
 constexpr inline ignore_t ignore;
