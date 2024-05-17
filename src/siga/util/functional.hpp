@@ -43,8 +43,6 @@ public:
     [[nodiscard]] constexpr lazy_eval_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
-    // TODO: should inherit `[[nodiscard]]` from the underlying functor but I'm not sure if it is
-    // even possible
     constexpr operator decltype(auto)() & noexcept(std::is_nothrow_invocable_v<F &>) {
         return std::invoke(func_);
     }
