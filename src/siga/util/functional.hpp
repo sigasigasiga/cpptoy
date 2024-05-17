@@ -3,11 +3,11 @@
 namespace siga::util {
 
 template<typename T, bool UseRoundBrackets = true>
-class construct_t
+class [[nodiscard]] construct_t
 {
 public:
     template<typename... Args>
-    [[nodiscard]] static constexpr T operator()(Args &&...args)
+    static constexpr T operator()(Args &&...args)
         noexcept(std::is_nothrow_constructible_v<T, Args &&...>) {
         if constexpr(UseRoundBrackets) {
             return T(std::forward<Args>(args)...);
@@ -22,12 +22,12 @@ inline constexpr construct_t<T, UseRoundBrackets> construct;
 
 // ------------------------------------------------------------------------------------------------
 
-class indirect_t
+class [[nodiscard]] indirect_t
 {
 public:
     // TODO: noexcept
     template<typename T>
-    [[nodiscard]] static constexpr decltype(auto) operator()(T &&object) {
+    static constexpr decltype(auto) operator()(T &&object) {
         return *std::forward<T>(object);
     }
 };
@@ -37,10 +37,10 @@ inline constexpr indirect_t indirect;
 // ------------------------------------------------------------------------------------------------
 
 template<typename F>
-class lazy_eval_t
+class [[nodiscard]] lazy_eval_t
 {
 public:
-    [[nodiscard]] constexpr lazy_eval_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+    constexpr lazy_eval_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
 public:
@@ -76,7 +76,7 @@ template<typename F, typename... Args>
 
 // ------------------------------------------------------------------------------------------------
 
-class get_reference_t
+class [[nodiscard]] get_reference_t
 {
 public:
     template<typename T>
@@ -96,10 +96,10 @@ inline constexpr get_reference_t get_reference;
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class equal_to_t
+class [[nodiscard]] equal_to_t
 {
 public:
-    [[nodiscard]] constexpr equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
@@ -116,10 +116,10 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class not_equal_to_t
+class [[nodiscard]] not_equal_to_t
 {
 public:
-    [[nodiscard]] constexpr not_equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr not_equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
@@ -136,10 +136,10 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class return_t
+class [[nodiscard]] return_t
 {
 public:
-    [[nodiscard]] constexpr return_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr return_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
@@ -162,19 +162,19 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename F, typename... Rest>
-class compose_t
+template<typename F, typename... RestF>
+class [[nodiscard]] compose_t
 {
 private:
-    using rest_t = compose_t<Rest...>;
+    using rest_t = compose_t<RestF...>;
 
 public:
-    constexpr compose_t(
-        F func,
-        Rest... rest
-    ) noexcept(std::is_nothrow_constructible_v<F> && std::is_nothrow_constructible_v<rest_t, Rest...>)
+    constexpr compose_t(F func, RestF... rest_funcs) noexcept(
+        std::is_nothrow_move_constructible_v<F> &&
+        (... && std::is_nothrow_move_constructible_v<RestF>)
+    )
         : func_{std::move(func)}
-        , rest_{std::move(rest)...} {}
+        , rest_{std::move(rest_funcs)...} {}
 
 public:
     // TODO: noexcept
@@ -192,10 +192,10 @@ private:
 };
 
 template<typename F>
-class compose_t<F>
+class [[nodiscard]] compose_t<F>
 {
 public:
-    [[nodiscard]] constexpr compose_t(F func) noexcept(std::is_nothrow_constructible_v<F>)
+    constexpr compose_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
 public:
@@ -211,19 +211,15 @@ private:
 
 } // namespace siga::util
 
-// clang-format off
+#define SIGA_UTIL_LIFT(X)                                                                          \
+    []<typename... Args>(Args &&...args                                                            \
+    ) constexpr noexcept(noexcept(X(std::forward<Args>(args)...))) -> decltype(auto) {             \
+        return X(std::forward<Args>(args)...);                                                     \
+    }
 
-#define SIGA_UTIL_LIFT(X)                                                      \
-    []<typename... Args>(Args &&...args) constexpr                             \
-    noexcept(noexcept(X(std::forward<Args>(args)...)))                         \
-    -> decltype(auto)                                                          \
-    { return X(std::forward<Args>(args)...); }
-
-#define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                          \
-    []<typename Object, typename... Args>                                      \
-    (Object &&object, Args &&...args) constexpr                                \
-    noexcept(noexcept(std::declval<Object>().METHOD(std::declval<Args>()...))) \
-    -> decltype(auto)                                                          \
-    { return std::forward<Object>(object).METHOD(std::forward<Args>(args)...); }
-
-// clang-format on
+#define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                                              \
+    []<typename Object, typename... Args>(Object &&object, Args &&...args) constexpr noexcept(     \
+        noexcept(std::declval<Object>().METHOD(std::declval<Args>()...))                           \
+    ) -> decltype(auto) {                                                                          \
+        return std::forward<Object>(object).METHOD(std::forward<Args>(args)...);                   \
+    }
