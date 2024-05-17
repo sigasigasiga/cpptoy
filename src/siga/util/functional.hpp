@@ -43,6 +43,7 @@ public:
     [[nodiscard]] constexpr lazy_eval_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
+public:
     constexpr operator decltype(auto)() & noexcept(std::is_nothrow_invocable_v<F &>) {
         return std::invoke(func_);
     }
@@ -101,6 +102,7 @@ public:
     [[nodiscard]] constexpr equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
+public:
     // TODO: noexcept
     template<typename Self, typename Rhs>
     [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs) {
@@ -120,6 +122,7 @@ public:
     [[nodiscard]] constexpr not_equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
+public:
     // TODO: noexcept
     template<typename Self, typename Rhs>
     [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs) {
@@ -139,6 +142,7 @@ public:
     [[nodiscard]] constexpr return_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
+public:
     // TODO: noexcept
     template<typename Self>
     [[nodiscard]] constexpr auto operator()(this Self &&self, auto &&...) {
@@ -154,6 +158,55 @@ class return_t<void>
 {
 public:
     constexpr void operator()(auto &&...) noexcept {}
+};
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename F, typename... Rest>
+class compose_t
+{
+private:
+    using rest_t = compose_t<Rest...>;
+
+public:
+    constexpr compose_t(
+        F func,
+        Rest... rest
+    ) noexcept(std::is_nothrow_constructible_v<F> && std::is_nothrow_constructible_v<rest_t, Rest...>)
+        : func_{std::move(func)}
+        , rest_{std::move(rest)...} {}
+
+public:
+    // TODO: noexcept
+    template<typename Self, typename... Args>
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args) {
+        return std::invoke(
+            std::forward<Self>(self).rest_,
+            std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...)
+        );
+    }
+
+private:
+    F func_;
+    rest_t rest_;
+};
+
+template<typename F>
+class compose_t<F>
+{
+public:
+    [[nodiscard]] constexpr compose_t(F func) noexcept(std::is_nothrow_constructible_v<F>)
+        : func_{std::move(func)} {}
+
+public:
+    // TODO: noexcept
+    template<typename Self, typename... Args>
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args) {
+        return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
+    }
+
+private:
+    F func_;
 };
 
 } // namespace siga::util
