@@ -18,6 +18,7 @@
 // misc
 #include <cassert>
 #include <chrono>
+#include <compare>
 #include <concepts>
 #include <expected>
 #include <filesystem>
