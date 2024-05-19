@@ -7,7 +7,7 @@ class [[nodiscard]] construct_t
 {
 public:
     template<typename... Args>
-    static constexpr T operator()(Args &&...args)
+    [[nodiscard]] static constexpr T operator()(Args &&...args)
         noexcept(std::is_nothrow_constructible_v<T, Args &&...>) {
         if constexpr(UseRoundBrackets) {
             return T(std::forward<Args>(args)...);
@@ -25,9 +25,9 @@ inline constexpr construct_t<T, UseRoundBrackets> construct;
 class [[nodiscard]] indirect_t
 {
 public:
-    // TODO: noexcept
     template<typename T>
-    static constexpr decltype(auto) operator()(T &&object) {
+    static constexpr decltype(auto) operator()(T &&object)
+        noexcept(noexcept(*std::forward<T>(object))) {
         return *std::forward<T>(object);
     }
 };
@@ -103,9 +103,10 @@ public:
         : data_{std::move(data)} {}
 
 public:
-    // TODO: noexcept
     template<typename Self, typename Rhs>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs) {
+    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
+        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs))
+        ) {
         return get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs);
     }
 
@@ -123,10 +124,11 @@ public:
         : data_{std::move(data)} {}
 
 public:
-    // TODO: noexcept
     template<typename Self, typename Rhs>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs) {
-        return get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs);
+    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
+        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs))
+        ) {
+        return get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs);
     }
 
 private:
