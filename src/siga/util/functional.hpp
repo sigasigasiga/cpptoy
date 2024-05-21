@@ -211,6 +211,42 @@ private:
     F func_;
 };
 
+// ------------------------------------------------------------------------------------------------
+
+template<typename T>
+class typed_get_t
+{
+public:
+    template<typename Gettable>
+    static constexpr decltype(auto) operator()(Gettable &&gettable)
+        noexcept(noexcept(get<T>(std::declval<Gettable>()))) //
+    {
+        return get<T>(std::forward<Gettable>(gettable));
+    }
+};
+
+template<auto V>
+class valued_get_t
+{
+public:
+    template<typename Gettable>
+    static constexpr decltype(auto) operator()(Gettable &&gettable)
+        noexcept(noexcept(get<V>(std::declval<Gettable>()))) //
+    {
+        return get<V>(std::forward<Gettable>(gettable));
+    }
+};
+
+template<typename T>
+typed_get_t<T> make_get() {
+    return {};
+}
+
+template<auto V>
+valued_get_t<V> make_get() {
+    return {};
+}
+
 } // namespace siga::util
 
 #define SIGA_UTIL_LIFT(X)                                                                          \
