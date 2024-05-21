@@ -214,11 +214,11 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class typed_get_t
+class [[nodiscard]] typed_get_t
 {
 public:
     template<typename Gettable>
-    static constexpr decltype(auto) operator()(Gettable &&gettable)
+    [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
         noexcept(noexcept(get<T>(std::declval<Gettable>()))) //
     {
         return get<T>(std::forward<Gettable>(gettable));
@@ -226,11 +226,11 @@ public:
 };
 
 template<auto V>
-class valued_get_t
+class [[nodiscard]] valued_get_t
 {
 public:
     template<typename Gettable>
-    static constexpr decltype(auto) operator()(Gettable &&gettable)
+    [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
         noexcept(noexcept(get<V>(std::declval<Gettable>()))) //
     {
         return get<V>(std::forward<Gettable>(gettable));
@@ -238,14 +238,17 @@ public:
 };
 
 template<typename T>
-typed_get_t<T> make_get() {
+constexpr typed_get_t<T> make_get() noexcept {
     return {};
 }
 
 template<auto V>
-valued_get_t<V> make_get() {
+constexpr valued_get_t<V> make_get() noexcept {
     return {};
 }
+
+inline constexpr auto get_key = make_get<0>();
+inline constexpr auto get_value = make_get<1>();
 
 } // namespace siga::util
 
