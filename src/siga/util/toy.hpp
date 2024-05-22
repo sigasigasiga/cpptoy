@@ -78,14 +78,14 @@ template<typename T>
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class type_tag_t
+class [[nodiscard]] type_tag_t
 {
 public:
     using type = T;
 };
 
 template<auto V>
-class value_tag_t
+class [[nodiscard]] value_tag_t
 {
 public:
     constexpr static auto value = V;
@@ -104,7 +104,7 @@ constexpr value_tag_t<V> make_tag() noexcept {
 // ------------------------------------------------------------------------------------------------
 
 template<typename... Ts>
-class type_list_t
+class [[nodiscard]] type_list_t
 {};
 
 } // namespace siga::util

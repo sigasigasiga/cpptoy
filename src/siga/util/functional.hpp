@@ -156,7 +156,7 @@ private:
 };
 
 template<>
-class return_t<void>
+class [[nodiscard]] return_t<void>
 {
 public:
     constexpr void operator()(auto &&...) noexcept {}
