@@ -13,7 +13,7 @@ type_print_t<T> print_type(const T &);
 template<auto>
 struct value_print_t;
 
-// ============================================================================
+// ------------------------------------------------------------------------------------------------
 
 class printing_constructor_t
 {
@@ -44,7 +44,7 @@ public:
     ~printing_constructor_t() { std::cout << "~printing_constructor_t()" << std::endl; }
 };
 
-// ============================================================================
+// ------------------------------------------------------------------------------------------------
 
 class ignore_t
 {
@@ -54,5 +54,22 @@ public:
 };
 
 inline constexpr ignore_t ignore;
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename T>
+void do_not_optimize(T &&value) {
+    asm volatile("" // empty command
+
+                 : "+r,m"(value) // input param, where:
+                                 // `+` -- input/output operand
+                                 // `r` -- general-purpose register operand
+                                 // `m` -- memory operand with arbitrary addressing mode
+
+                 : // output param, empty
+
+                 : "memory" // clobbers memory
+    );
+}
 
 } // namespace siga::util
