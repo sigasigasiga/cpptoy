@@ -1,5 +1,7 @@
 #pragma once
 
+#include "siga/util/meta.hpp"
+
 namespace siga::util {
 
 template<typename T, bool UseRoundBrackets = true>
@@ -174,22 +176,31 @@ private:
     using rest_t = compose<RestF...>;
 
 public:
-    constexpr compose(F func, RestF... rest_funcs) noexcept(
-        std::is_nothrow_move_constructible_v<F> &&
-        (... && std::is_nothrow_move_constructible_v<RestF>)
-    )
+    constexpr compose(
+        F func,
+        RestF... rest_funcs
+    ) noexcept(std::is_nothrow_move_constructible_v<F> && std::is_nothrow_constructible_v<rest_t, RestF...>)
         : func_{std::move(func)}
         , rest_{std::move(rest_funcs)...} {}
 
 public:
-    // TODO: noexcept
+    // clang-format off
     template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(this Self &&self, Args &&...args) {
+    constexpr decltype(auto) operator()(
+        this Self &&self,
+        Args &&...args
+    )
+        noexcept(
+            std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...> &&
+            std::is_nothrow_invocable_v<rest_t, std::invoke_result_t<copy_cv_ref_t<Self, F>, Args &&...>>
+        )
+    {
         return std::invoke(
             std::forward<Self>(self).rest_,
             std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...)
         );
     }
+    // clang-format on
 
 private:
     F func_;
@@ -204,9 +215,10 @@ public:
         : func_{std::move(func)} {}
 
 public:
-    // TODO: noexcept
     template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(this Self &&self, Args &&...args) {
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>) //
+    {
         return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
     }
 
@@ -255,15 +267,24 @@ inline constexpr auto get_value = make_get<1>();
 
 } // namespace siga::util
 
+// clang-format off
 #define SIGA_UTIL_LIFT(X)                                                                          \
-    []<typename... Args>(Args &&...args                                                            \
-    ) constexpr noexcept(noexcept(X(std::forward<Args>(args)...))) -> decltype(auto) {             \
+    []<typename... Args>(Args &&...args)                                                           \
+        constexpr                                                                                  \
+        static                                                                                     \
+        noexcept(noexcept(X(std::forward<Args>(args)...)))                                         \
+        -> decltype(auto)                                                                          \
+    {                                                                                              \
         return X(std::forward<Args>(args)...);                                                     \
     }
 
 #define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                                              \
-    []<typename Object, typename... Args>(Object &&object, Args &&...args) constexpr noexcept(     \
-        noexcept(std::declval<Object>().METHOD(std::declval<Args>()...))                           \
-    ) -> decltype(auto) {                                                                          \
+    []<typename Object, typename... Args>(Object &&object, Args &&...args)                         \
+        constexpr                                                                                  \
+        static                                                                                     \
+        noexcept(noexcept(std::declval<Object>().METHOD(std::declval<Args>()...)))                 \
+        -> decltype(auto)                                                                          \
+    {                                                                                              \
         return std::forward<Object>(object).METHOD(std::forward<Args>(args)...);                   \
     }
+// clang-format on
