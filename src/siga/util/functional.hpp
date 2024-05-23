@@ -37,10 +37,10 @@ inline constexpr indirect_t indirect;
 // ------------------------------------------------------------------------------------------------
 
 template<typename F>
-class [[nodiscard]] lazy_eval_t
+class [[nodiscard]] lazy_eval
 {
 public:
-    constexpr lazy_eval_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+    constexpr lazy_eval(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
 public:
@@ -68,9 +68,9 @@ private:
 template<typename F, typename... Args>
 [[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args) {
     if constexpr(sizeof...(args) == 0) {
-        return lazy_eval_t{std::forward<F>(func)};
+        return lazy_eval{std::forward<F>(func)};
     } else {
-        return lazy_eval_t{std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)};
+        return lazy_eval{std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)};
     }
 }
 
@@ -96,10 +96,10 @@ inline constexpr get_reference_t get_reference;
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class [[nodiscard]] equal_to_t
+class [[nodiscard]] equal_to
 {
 public:
-    constexpr equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
@@ -117,10 +117,10 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class [[nodiscard]] not_equal_to_t
+class [[nodiscard]] not_equal_to
 {
 public:
-    constexpr not_equal_to_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr not_equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
@@ -138,17 +138,20 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class [[nodiscard]] return_t
+class [[nodiscard]] return_value
 {
+private:
+    using return_type = std::decay_t<std::unwrap_reference_t<T>>;
+
 public:
-    constexpr return_t(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+    constexpr return_value(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
         : data_{std::move(data)} {}
 
 public:
-    // TODO: noexcept
     template<typename Self>
-    [[nodiscard]] constexpr auto operator()(this Self &&self, auto &&...) {
-        return get_reference(std::forward<Self>(self).data_);
+    [[nodiscard]] constexpr return_type operator()(this Self &&self, auto &&...)
+        noexcept(std::is_nothrow_copy_constructible_v<return_type>) {
+        return std::forward<Self>(self).data_;
     }
 
 private:
@@ -156,7 +159,7 @@ private:
 };
 
 template<>
-class [[nodiscard]] return_t<void>
+class [[nodiscard]] return_value<void>
 {
 public:
     constexpr void operator()(auto &&...) noexcept {}
@@ -165,13 +168,13 @@ public:
 // ------------------------------------------------------------------------------------------------
 
 template<typename F, typename... RestF>
-class [[nodiscard]] compose_t
+class [[nodiscard]] compose
 {
 private:
-    using rest_t = compose_t<RestF...>;
+    using rest_t = compose<RestF...>;
 
 public:
-    constexpr compose_t(F func, RestF... rest_funcs) noexcept(
+    constexpr compose(F func, RestF... rest_funcs) noexcept(
         std::is_nothrow_move_constructible_v<F> &&
         (... && std::is_nothrow_move_constructible_v<RestF>)
     )
@@ -194,10 +197,10 @@ private:
 };
 
 template<typename F>
-class [[nodiscard]] compose_t<F>
+class [[nodiscard]] compose<F>
 {
 public:
-    constexpr compose_t(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+    constexpr compose(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)} {}
 
 public:
@@ -214,7 +217,7 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class [[nodiscard]] typed_get_t
+class [[nodiscard]] typed_get
 {
 public:
     template<typename Gettable>
@@ -226,7 +229,7 @@ public:
 };
 
 template<auto V>
-class [[nodiscard]] valued_get_t
+class [[nodiscard]] valued_get
 {
 public:
     template<typename Gettable>
@@ -238,12 +241,12 @@ public:
 };
 
 template<typename T>
-constexpr typed_get_t<T> make_get() noexcept {
+constexpr typed_get<T> make_get() noexcept {
     return {};
 }
 
 template<auto V>
-constexpr valued_get_t<V> make_get() noexcept {
+constexpr valued_get<V> make_get() noexcept {
     return {};
 }
 

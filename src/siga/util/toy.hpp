@@ -5,43 +5,42 @@
 namespace siga::util {
 
 template<typename>
-struct type_print_t;
+struct type_print;
 
 template<typename T>
-type_print_t<T> print_type(const T &);
+type_print<T> print_type(const T &);
 
 template<auto>
-struct value_print_t;
+struct value_print;
 
 // ------------------------------------------------------------------------------------------------
 
-class printing_constructor_t
+class printing_constructor
 {
 public:
-    printing_constructor_t() { std::cout << "printing_constructor_t()" << std::endl; }
+    printing_constructor() { std::cout << "printing_constructor()" << std::endl; }
 
-    printing_constructor_t(const printing_constructor_t &) {
-        std::cout << "printing_constructor_t(const printing_constructor_t &)" << std::endl;
+    printing_constructor(const printing_constructor &) {
+        std::cout << "printing_constructor(const printing_constructor &)" << std::endl;
     }
 
-    printing_constructor_t(printing_constructor_t &&) {
-        std::cout << "printing_constructor_t(printing_constructor_t &&)" << std::endl;
+    printing_constructor(printing_constructor &&) {
+        std::cout << "printing_constructor(printing_constructor &&)" << std::endl;
     }
 
-    printing_constructor_t &operator=(const printing_constructor_t &) {
-        std::cout << "printing_constructor_t &operator=(const printing_constructor_t &)"
-                  << std::endl;
+    printing_constructor &operator=(const printing_constructor &) {
+        std::cout << "printing_constructor &operator=(const printing_constructor &)" << std::endl;
 
         return *this;
     }
 
-    printing_constructor_t &operator=(printing_constructor_t &&) {
-        std::cout << "printing_constructor_t &operator=(printing_constructor_t &&)" << std::endl;
+    printing_constructor &operator=(printing_constructor &&) {
+        std::cout << "printing_constructor &operator=(printing_constructor &&)" << std::endl;
 
         return *this;
     }
 
-    ~printing_constructor_t() { std::cout << "~printing_constructor_t()" << std::endl; }
+    ~printing_constructor() { std::cout << "~printing_constructor()" << std::endl; }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -78,33 +77,33 @@ template<typename T>
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-class [[nodiscard]] type_tag_t
+class [[nodiscard]] type_tag
 {
 public:
     using type = T;
 };
 
 template<auto V>
-class [[nodiscard]] value_tag_t
+class [[nodiscard]] value_tag
 {
 public:
     constexpr static auto value = V;
 };
 
 template<typename T>
-constexpr type_tag_t<T> make_tag() noexcept {
+constexpr type_tag<T> make_tag() noexcept {
     return {};
 }
 
 template<auto V>
-constexpr value_tag_t<V> make_tag() noexcept {
+constexpr value_tag<V> make_tag() noexcept {
     return {};
 }
 
 // ------------------------------------------------------------------------------------------------
 
 template<typename... Ts>
-class [[nodiscard]] type_list_t
+class [[nodiscard]] type_list
 {};
 
 } // namespace siga::util

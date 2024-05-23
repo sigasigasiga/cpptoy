@@ -8,7 +8,6 @@
             "program": "${workspaceFolder}/bin/toy",
             "args": "",
             "cwd": "${workspaceFolder}",
-            "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": "Build"
         }
     ]
