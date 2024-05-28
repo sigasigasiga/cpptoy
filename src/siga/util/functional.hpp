@@ -270,10 +270,18 @@ inline constexpr auto get_value = make_get<1>();
 class for_each_in_parameter_pack_t
 {
 public:
+    // well, if `std::for_each` and `std::ranges::for_each` are not marked as `noexcept`,
+    // why should i do that here?
+    //
+    // however, it should probably be written like so:
+    // ```
+    // noexcept(
+    //     (... && std::is_nothrow_invocable_v<F, Args &&>) &&
+    //     std::is_nothrow_move_constructible_v<F>
+    // )
+    // ```
     template<typename F, typename... Args>
-    static constexpr F operator()(F func, Args &&...args)
-        noexcept((... && std::is_nothrow_invocable_v<F, Args &&>)) //
-    {
+    static constexpr F operator()(F func, Args &&...args) {
         (..., static_cast<void>(std::invoke(func, std::forward<Args>(args))));
         return func;
     }

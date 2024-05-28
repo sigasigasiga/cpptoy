@@ -10,7 +10,7 @@ namespace siga::util {
 class for_each_in_tuple_t
 {
 public:
-    // TODO: noexcept
+    // see `noexcept` policy for `for_each_in_parameter_pack`
     template<typename F, tuple_like Tuple>
     static constexpr F operator()(F func, Tuple &&tuple) {
         return std::apply(
