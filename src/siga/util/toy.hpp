@@ -18,7 +18,7 @@ struct value_print;
 class printing_constructor
 {
 public:
-    printing_constructor() { std::cout << "printing_constructor()" << std::endl; }
+    printing_constructor() { std::cout << "printing_constructor(): " << this << std::endl; }
 
     printing_constructor(const printing_constructor &) {
         std::cout << "printing_constructor(const printing_constructor &)" << std::endl;
@@ -40,7 +40,7 @@ public:
         return *this;
     }
 
-    ~printing_constructor() { std::cout << "~printing_constructor()" << std::endl; }
+    ~printing_constructor() { std::cout << "~printing_constructor(): " << this << std::endl; }
 };
 
 // ------------------------------------------------------------------------------------------------
