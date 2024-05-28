@@ -5,7 +5,7 @@ namespace siga::util {
 // `util/utility.hpp` sounds funny, but I was trying to somehow resemble the `<utility>` STL header
 
 template<typename T>
-constexpr decltype(auto) cut_rvalue_ref(T &&v) noexcept {
+[[nodiscard]] constexpr decltype(auto) cut_rvalue_ref(T &&v) noexcept {
     // cut_rvalue_ref(0) -> cut_rvalue_ref<int>(int &&);
     // cut_rvalue_ref(x) -> cut_rvalue_ref<int &>(int &);
     //

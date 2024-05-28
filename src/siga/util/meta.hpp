@@ -49,6 +49,12 @@ static_assert(std::same_as<combine_t<const int &, std::remove_reference, std::re
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename... Ts>
+class [[nodiscard]] type_list
+{};
+
+// ------------------------------------------------------------------------------------------------
+
 template<typename From, typename To>
 class copy_const
 {

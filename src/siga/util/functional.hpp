@@ -267,7 +267,7 @@ inline constexpr auto get_value = make_get<1>();
 
 // ------------------------------------------------------------------------------------------------
 
-class for_each_in_parameter_pack_t
+class [[nodiscard]] for_each_in_parameter_pack_t
 {
 public:
     // well, if `std::for_each` and `std::ranges::for_each` are not marked as `noexcept`,
@@ -292,7 +292,7 @@ inline constexpr for_each_in_parameter_pack_t for_each_in_parameter_pack;
 // ------------------------------------------------------------------------------------------------
 
 template<typename... Ts>
-class overload : public Ts...
+class [[nodiscard]] overload : public Ts...
 {
 public:
     using Ts::operator()...;

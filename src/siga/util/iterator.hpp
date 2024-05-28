@@ -4,7 +4,7 @@ namespace siga::util {
 
 template<typename DelimT, typename CharT = char, typename Traits = std::char_traits<CharT>>
 requires std::copy_constructible<DelimT> || std::move_constructible<DelimT>
-class ostream_joiner
+class [[nodiscard]] ostream_joiner
 {
 public:
     using char_type = CharT;

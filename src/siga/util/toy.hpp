@@ -124,10 +124,4 @@ constexpr value_tag<V> make_tag() noexcept {
     return {};
 }
 
-// ------------------------------------------------------------------------------------------------
-
-template<typename... Ts>
-class [[nodiscard]] type_list
-{};
-
 } // namespace siga::util
