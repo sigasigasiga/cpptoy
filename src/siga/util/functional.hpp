@@ -265,7 +265,32 @@ constexpr valued_get<V> make_get() noexcept {
 inline constexpr auto get_key = make_get<0>();
 inline constexpr auto get_value = make_get<1>();
 
-} // namespace siga::util
+// ------------------------------------------------------------------------------------------------
+
+class for_each_in_parameter_pack_t
+{
+public:
+    template<typename F, typename... Args>
+    static constexpr F operator()(F func, Args &&...args)
+        noexcept((... && std::is_nothrow_invocable_v<F, Args &&>)) //
+    {
+        (..., static_cast<void>(std::invoke(func, std::forward<Args>(args))));
+        return func;
+    }
+};
+
+inline constexpr for_each_in_parameter_pack_t for_each_in_parameter_pack;
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename... Ts>
+class overload : public Ts...
+{
+public:
+    using Ts::operator()...;
+};
+
+// ------------------------------------------------------------------------------------------------
 
 // clang-format off
 #define SIGA_UTIL_LIFT(X)                                                                          \
@@ -277,7 +302,11 @@ inline constexpr auto get_value = make_get<1>();
     {                                                                                              \
         return X(std::forward<Args>(args)...);                                                     \
     }
+// clang-format on
 
+// ------------------------------------------------------------------------------------------------
+
+// clang-format off
 #define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                                              \
     []<typename Object, typename... Args>(Object &&object, Args &&...args)                         \
         constexpr                                                                                  \
@@ -288,3 +317,5 @@ inline constexpr auto get_value = make_get<1>();
         return std::forward<Object>(object).METHOD(std::forward<Args>(args)...);                   \
     }
 // clang-format on
+
+} // namespace siga::util

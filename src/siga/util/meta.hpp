@@ -8,22 +8,30 @@ concept conceptify = Trait<T>::value;
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename T>
+concept tuple_like = requires(T tuple) {
+    std::tuple_size<T>::value;
+    // TODO: check `std::tuple_element`, `get<Type>` and `get<Number>`
+};
+
+// ------------------------------------------------------------------------------------------------
+
 template<typename T, template<typename...> typename Trait, template<typename...> typename... Rest>
-class combine
+class combine_traits
 {
 public:
-    using type = combine<typename Trait<T>::type, Rest...>::type;
+    using type = combine_traits<typename Trait<T>::type, Rest...>::type;
 };
 
 template<typename T, template<typename...> typename Trait>
-class combine<T, Trait>
+class combine_traits<T, Trait>
 {
 public:
     using type = Trait<T>::type;
 };
 
 template<typename T, template<typename...> typename... Traits>
-using combine_t = combine<T, Traits...>::type;
+using combine_traits_t = combine_traits<T, Traits...>::type;
 
 #if 0
 static_assert(std::same_as<combine_t<const int &, std::remove_reference, std::remove_cv>, int>);

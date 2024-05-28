@@ -48,4 +48,5 @@
 #include "siga/util/iterator.hpp"
 #include "siga/util/meta.hpp"
 #include "siga/util/toy.hpp"
+#include "siga/util/tuple.hpp"
 #include "siga/util/utility.hpp"
