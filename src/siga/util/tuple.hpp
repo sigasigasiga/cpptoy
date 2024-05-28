@@ -13,8 +13,10 @@ public:
     // TODO: noexcept
     template<typename F, tuple_like Tuple>
     static constexpr F operator()(F func, Tuple &&tuple) {
-        std::apply(std::bind_front(for_each_in_parameter_pack, std::ref(func)), tuple);
-        return func;
+        return std::apply(
+            std::bind_front(for_each_in_parameter_pack, std::move(func)),
+            std::forward<Tuple>(tuple)
+        );
     }
 };
 
