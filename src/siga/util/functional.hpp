@@ -300,6 +300,20 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
+class [[nodiscard]] copy_t
+{
+public:
+    template<typename T>
+    [[nodiscard]] static constexpr T operator()(const T &v)
+        noexcept(std::is_nothrow_copy_constructible_v<T>) {
+        return v;
+    }
+};
+
+inline constexpr copy_t copy;
+
+// ------------------------------------------------------------------------------------------------
+
 // clang-format off
 #define SIGA_UTIL_LIFT(X)                                                                          \
     []<typename... Args>(Args &&...args)                                                           \
