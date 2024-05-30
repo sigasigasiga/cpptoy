@@ -20,7 +20,8 @@ class printing_constructor
 public:
     printing_constructor() { std::cout << "printing_constructor(): " << this << std::endl; }
 
-    printing_constructor(const printing_constructor &rhs) {
+    printing_constructor(const printing_constructor &rhs)
+    {
         // clang-format off
         std::cout
             << "printing_constructor(const printing_constructor &); "
@@ -30,7 +31,8 @@ public:
         // clang-format on
     }
 
-    printing_constructor(printing_constructor &&rhs) {
+    printing_constructor(printing_constructor &&rhs)
+    {
         // clang-format off
         std::cout
             << "printing_constructor(printing_constructor &&); "
@@ -40,7 +42,8 @@ public:
         // clang-format on
     }
 
-    printing_constructor &operator=(const printing_constructor &rhs) {
+    printing_constructor &operator=(const printing_constructor &rhs)
+    {
         // clang-format off
         std::cout
             << "printing_constructor &operator=(const printing_constructor &); " 
@@ -52,7 +55,8 @@ public:
         return *this;
     }
 
-    printing_constructor &operator=(printing_constructor &&rhs) {
+    printing_constructor &operator=(printing_constructor &&rhs)
+    {
         // clang-format off
         std::cout
             << "printing_constructor &operator=(printing_constructor &&); " 
@@ -81,7 +85,8 @@ inline constexpr ignore_t ignore;
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
-[[clang::always_inline]] void do_not_optimize(T &&value) {
+[[clang::always_inline]] void do_not_optimize(T &&value)
+{
     // `volatile` prevents the instruction from being deleted
     asm volatile(
 
@@ -115,12 +120,14 @@ public:
 };
 
 template<typename T>
-constexpr type_tag<T> make_tag() noexcept {
+constexpr type_tag<T> make_tag() noexcept
+{
     return {};
 }
 
 template<auto V>
-constexpr value_tag<V> make_tag() noexcept {
+constexpr value_tag<V> make_tag() noexcept
+{
     return {};
 }
 

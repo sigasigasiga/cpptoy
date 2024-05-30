@@ -21,12 +21,16 @@ public:
     ostream_joiner(ostream_type &os, const DelimT &delim)
         : os_{std::addressof(os)}
         , delim_{delim}
-        , first_{true} {}
+        , first_{true}
+    {
+    }
 
     ostream_joiner(ostream_type &os, DelimT &&delim)
         : os_{std::addressof(os)}
         , delim_{std::move(delim)}
-        , first_{true} {}
+        , first_{true}
+    {
+    }
 
     ostream_joiner(const ostream_joiner &) = default;
     ostream_joiner(ostream_joiner &&) = default;
@@ -36,7 +40,8 @@ public:
 
 public:
     template<typename T>
-    ostream_joiner &operator=(const T &value) {
+    ostream_joiner &operator=(const T &value)
+    {
         if(!std::exchange(first_, false)) {
             *os_ << delim_;
         }
@@ -59,7 +64,8 @@ private:
 };
 
 template<typename CharT, typename Traits, typename DelimT>
-auto make_ostream_joiner(std::basic_ostream<CharT, Traits> &os, DelimT &&delim) {
+auto make_ostream_joiner(std::basic_ostream<CharT, Traits> &os, DelimT &&delim)
+{
     return ostream_joiner<std::decay_t<DelimT>, CharT, Traits>{os, std::forward<DelimT>(delim)};
 }
 

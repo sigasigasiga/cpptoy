@@ -10,7 +10,8 @@ class [[nodiscard]] construct_t
 public:
     template<typename... Args>
     [[nodiscard]] static constexpr T operator()(Args &&...args)
-        noexcept(std::is_nothrow_constructible_v<T, Args &&...>) {
+        noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
+    {
         if constexpr(UseRoundBrackets) {
             return T(std::forward<Args>(args)...);
         } else {
@@ -29,7 +30,8 @@ class [[nodiscard]] indirect_t
 public:
     template<typename T>
     static constexpr decltype(auto) operator()(T &&object)
-        noexcept(noexcept(*std::forward<T>(object))) {
+        noexcept(noexcept(*std::forward<T>(object)))
+    {
         return *std::forward<T>(object);
     }
 };
@@ -43,22 +45,28 @@ class [[nodiscard]] lazy_eval
 {
 public:
     constexpr lazy_eval(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : func_{std::move(func)} {}
+        : func_{std::move(func)}
+    {
+    }
 
 public:
-    constexpr operator decltype(auto)() & noexcept(std::is_nothrow_invocable_v<F &>) {
+    constexpr operator decltype(auto)() & noexcept(std::is_nothrow_invocable_v<F &>)
+    {
         return std::invoke(func_);
     }
 
-    constexpr operator decltype(auto)() const & noexcept(std::is_nothrow_invocable_v<const F &>) {
+    constexpr operator decltype(auto)() const & noexcept(std::is_nothrow_invocable_v<const F &>)
+    {
         return std::invoke(func_);
     }
 
-    constexpr operator decltype(auto)() && noexcept(std::is_nothrow_invocable_v<F &&>) {
+    constexpr operator decltype(auto)() && noexcept(std::is_nothrow_invocable_v<F &&>)
+    {
         return std::invoke(std::move(func_));
     }
 
-    constexpr operator decltype(auto)() const && noexcept(std::is_nothrow_invocable_v<const F &&>) {
+    constexpr operator decltype(auto)() const && noexcept(std::is_nothrow_invocable_v<const F &&>)
+    {
         return std::invoke(std::move(func_));
     }
 
@@ -68,7 +76,8 @@ private:
 
 // TODO: noexcept
 template<typename F, typename... Args>
-[[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args) {
+[[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args)
+{
     if constexpr(sizeof...(args) == 0) {
         return lazy_eval{std::forward<F>(func)};
     } else {
@@ -82,13 +91,15 @@ class [[nodiscard]] get_reference_t
 {
 public:
     template<typename T>
-    [[nodiscard]] static constexpr decltype(auto) operator()(T &&value) noexcept {
+    [[nodiscard]] static constexpr decltype(auto) operator()(T &&value) noexcept
+    {
         return std::forward<T>(value);
     }
 
     template<typename T>
     [[nodiscard]] static constexpr decltype(auto) operator()(std::reference_wrapper<T> value
-    ) noexcept {
+    ) noexcept
+    {
         return value.get();
     }
 };
@@ -102,13 +113,15 @@ class [[nodiscard]] equal_to
 {
 public:
     constexpr equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)} {}
+        : data_{std::move(data)}
+    {
+    }
 
 public:
     template<typename Self, typename Rhs>
     [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
-        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs))
-        ) {
+        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs)))
+    {
         return get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs);
     }
 
@@ -123,13 +136,15 @@ class [[nodiscard]] not_equal_to
 {
 public:
     constexpr not_equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)} {}
+        : data_{std::move(data)}
+    {
+    }
 
 public:
     template<typename Self, typename Rhs>
     [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
-        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs))
-        ) {
+        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs)))
+    {
         return get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs);
     }
 
@@ -147,12 +162,15 @@ private:
 
 public:
     constexpr return_value(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)} {}
+        : data_{std::move(data)}
+    {
+    }
 
 public:
     template<typename Self>
     [[nodiscard]] constexpr return_type operator()(this Self &&self, auto &&...)
-        noexcept(std::is_nothrow_copy_constructible_v<return_type>) {
+        noexcept(std::is_nothrow_copy_constructible_v<return_type>)
+    {
         return std::forward<Self>(self).data_;
     }
 
@@ -181,7 +199,9 @@ public:
         RestF... rest_funcs
     ) noexcept(std::is_nothrow_move_constructible_v<F> && std::is_nothrow_constructible_v<rest_t, RestF...>)
         : func_{std::move(func)}
-        , rest_{std::move(rest_funcs)...} {}
+        , rest_{std::move(rest_funcs)...}
+    {
+    }
 
 public:
     // clang-format off
@@ -212,7 +232,9 @@ class [[nodiscard]] compose<F>
 {
 public:
     constexpr compose(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : func_{std::move(func)} {}
+        : func_{std::move(func)}
+    {
+    }
 
 public:
     template<typename Self, typename... Args>
@@ -253,12 +275,14 @@ public:
 };
 
 template<typename T>
-constexpr typed_get<T> make_get() noexcept {
+constexpr typed_get<T> make_get() noexcept
+{
     return {};
 }
 
 template<auto V>
-constexpr valued_get<V> make_get() noexcept {
+constexpr valued_get<V> make_get() noexcept
+{
     return {};
 }
 
@@ -281,7 +305,8 @@ public:
     // )
     // ```
     template<typename F, typename... Args>
-    static constexpr F operator()(F func, Args &&...args) {
+    static constexpr F operator()(F func, Args &&...args)
+    {
         (..., static_cast<void>(std::invoke(func, std::forward<Args>(args))));
         return func;
     }
@@ -305,7 +330,8 @@ class [[nodiscard]] copy_t
 public:
     template<typename T>
     [[nodiscard]] static constexpr T operator()(const T &v)
-        noexcept(std::is_nothrow_copy_constructible_v<T>) {
+        noexcept(std::is_nothrow_copy_constructible_v<T>)
+    {
         return v;
     }
 };
