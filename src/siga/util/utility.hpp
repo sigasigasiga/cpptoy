@@ -20,18 +20,18 @@ inline constexpr copy_t copy;
 // ------------------------------------------------------------------------------------------------
 
 // unlike `copy_t`, the return value may be move-constructed
-class [[nodiscard]] unref_t
+class [[nodiscard]] decay_value_t
 {
 public:
     template<typename T>
-    [[nodiscard]] static constexpr auto operator()(T &&value)
+    [[nodiscard]] static constexpr std::decay_t<T> operator()(T &&value)
         noexcept(std::is_nothrow_constructible_v<std::decay_t<T>, T &&>)
     {
         return value;
     }
 };
 
-inline constexpr unref_t unref;
+inline constexpr decay_value_t decay_value;
 
 // ------------------------------------------------------------------------------------------------
 
@@ -56,10 +56,10 @@ inline constexpr cut_rvalue_ref_t cut_rvalue_ref;
 
 // useful for `std::optional::transform`
 template<typename F>
-class [[nodiscard]] unref_return : public compose<F, unref_t>
+class [[nodiscard]] decay_return : public compose<F, decay_value_t>
 {
 public:
-    constexpr unref_return(F func) : compose<F, unref_t>{std::move(func), {}} {}
+    constexpr decay_return(F func) : compose<F, decay_value_t>{std::move(func), {}} {}
 };
 
 // ------------------------------------------------------------------------------------------------
