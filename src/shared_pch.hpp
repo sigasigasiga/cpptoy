@@ -42,6 +42,7 @@
 // thirdparty
 #include <fmt/core.h>
 #include <range/v3/all.hpp>
+#include <tl/optional.hpp>
 
 // my includes
 #include "siga/util/functional.hpp"
