@@ -168,8 +168,8 @@ public:
 
 public:
     template<typename Self>
-    [[nodiscard]] constexpr return_type operator()(this Self &&self, auto &&...)
-        noexcept(std::is_nothrow_copy_constructible_v<return_type>)
+    [[nodiscard]] constexpr return_type operator()(this Self &&self)
+        noexcept(std::is_nothrow_constructible_v<return_type, copy_cv_ref_t<Self, T>>)
     {
         return std::forward<Self>(self).data_;
     }
@@ -182,7 +182,30 @@ template<>
 class [[nodiscard]] return_value<void>
 {
 public:
-    constexpr void operator()(auto &&...) noexcept {}
+    constexpr void operator()() noexcept {}
+};
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename F>
+class ignore_args
+{
+public:
+    constexpr ignore_args(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : func_{std::move(func)}
+    {
+    }
+
+public:
+    // TODO: noexcept
+    template<typename Self>
+    constexpr decltype(auto) operator()(this Self &&self, auto &&...)
+    {
+        return std::invoke(std::forward<Self>(self).func_);
+    }
+
+private:
+    F func_;
 };
 
 // ------------------------------------------------------------------------------------------------
