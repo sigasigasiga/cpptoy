@@ -262,7 +262,7 @@ public:
 public:
     template<typename Self, typename... Args>
     constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
-        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>) //
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
     {
         return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
     }
@@ -348,6 +348,37 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename F>
+class make_bind_expression
+{
+public:
+    constexpr make_bind_expression(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : func_{std::move(func)}
+    {
+    }
+
+public:
+    template<typename Self, typename... Args>
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
+    {
+        return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
+    }
+
+private:
+    F func_;
+};
+
+// ------------------------------------------------------------------------------------------------
+
+} // namespace siga::util
+
+template<typename F>
+class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std::true_type
+{};
+
+// ------------------------------------------------------------------------------------------------
+
 // clang-format off
 #define SIGA_UTIL_LIFT(X)                                                                          \
     []<typename... Args>(Args &&...args)                                                           \
@@ -373,5 +404,3 @@ public:
         return std::forward<Object>(object).METHOD(std::forward<Args>(args)...);                   \
     }
 // clang-format on
-
-} // namespace siga::util
