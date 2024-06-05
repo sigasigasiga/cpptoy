@@ -188,7 +188,7 @@ public:
 // ------------------------------------------------------------------------------------------------
 
 template<typename F>
-class ignore_args
+class [[nodiscard]] ignore_args
 {
 public:
     constexpr ignore_args(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
@@ -349,7 +349,7 @@ public:
 // ------------------------------------------------------------------------------------------------
 
 template<typename F>
-class make_bind_expression
+class [[nodiscard]] make_bind_expression
 {
 public:
     constexpr make_bind_expression(F func) noexcept(std::is_nothrow_move_constructible_v<F>)

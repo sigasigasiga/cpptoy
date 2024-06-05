@@ -38,8 +38,9 @@ inline constexpr decay_value_t decay_value;
 class [[nodiscard]] cut_rvalue_ref_t
 {
 public:
+    // TODO: noexcept
     template<typename T>
-    [[nodiscard]] static constexpr decltype(auto) operator()(T &&value) noexcept
+    [[nodiscard]] static constexpr decltype(auto) operator()(T &&value)
     {
         // cut_rvalue_ref(0) -> cut_rvalue_ref<int>(int &&);
         // cut_rvalue_ref(x) -> cut_rvalue_ref<int &>(int &);
