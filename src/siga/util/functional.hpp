@@ -197,9 +197,9 @@ public:
     }
 
 public:
-    // TODO: noexcept
     template<typename Self>
     constexpr decltype(auto) operator()(this Self &&self, auto &&...)
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>>)
     {
         return std::invoke(std::forward<Self>(self).func_);
     }
