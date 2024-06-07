@@ -57,21 +57,19 @@ inline constexpr cut_rvalue_ref_t cut_rvalue_ref;
 
 // useful for `std::optional::transform`
 template<typename F>
-class [[nodiscard]] decay_return : public compose<F, decay_value_t>
+[[nodiscard]] constexpr auto decay_return(F &&func)
 {
-public:
-    constexpr decay_return(F func) : compose<F, decay_value_t>{std::move(func), {}} {}
-};
+    return compose(std::forward<F>(func), decay_value);
+}
 
 // ------------------------------------------------------------------------------------------------
 
 // useful for `tl::optional::transform`,
 // although i think it should replace `T&&` with `T` automatically
 template<typename F>
-class [[nodiscard]] unrvalue_return : public compose<F, cut_rvalue_ref_t>
+[[nodiscard]] constexpr auto cut_rvalue_return(F &&func)
 {
-public:
-    constexpr unrvalue_return(F func) : compose<F, cut_rvalue_ref_t>{std::move(func), {}} {}
-};
+    return compose(std::forward<F>(func), cut_rvalue_ref);
+}
 
 } // namespace siga::util
