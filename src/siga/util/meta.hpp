@@ -44,7 +44,12 @@ template<typename T, template<typename...> typename... Traits>
 using combine_traits_t = combine_traits<T, Traits...>::type;
 
 #if 0
-static_assert(std::same_as<combine_t<const int &, std::remove_reference, std::remove_cv>, int>);
+static_assert(
+    std::same_as<
+        combine_traits_t<const int &, std::remove_reference, std::remove_cv>,
+        int
+    >
+);
 #endif
 
 // ------------------------------------------------------------------------------------------------
