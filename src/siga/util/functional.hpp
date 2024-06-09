@@ -157,7 +157,7 @@ private:
 template<typename T>
 class [[nodiscard]] return_value
 {
-private:
+public:
     using return_type = std::decay_t<std::unwrap_reference_t<T>>;
 
 public:
@@ -181,6 +181,9 @@ private:
 template<>
 class [[nodiscard]] return_value<void>
 {
+public:
+    using return_type = void;
+
 public:
     constexpr void operator()() noexcept {}
 };
@@ -279,7 +282,7 @@ class [[nodiscard]] typed_get
 public:
     template<typename Gettable>
     [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
-        noexcept(noexcept(get<T>(std::declval<Gettable>()))) //
+        noexcept(noexcept(get<T>(std::declval<Gettable>())))
     {
         return get<T>(std::forward<Gettable>(gettable));
     }
@@ -291,7 +294,7 @@ class [[nodiscard]] valued_get
 public:
     template<typename Gettable>
     [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
-        noexcept(noexcept(get<V>(std::declval<Gettable>()))) //
+        noexcept(noexcept(get<V>(std::declval<Gettable>())))
     {
         return get<V>(std::forward<Gettable>(gettable));
     }
