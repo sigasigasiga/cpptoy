@@ -4,10 +4,6 @@
 # ```
 project('toy', 'cpp', default_options : [ 'cpp_std=c++23' ])
 
-sources = [
-  'src/app.cpp',
-]
-
 deps = [
   dependency('fmt'),
   dependency('range-v3'),
@@ -21,8 +17,16 @@ deps = [
 
 executable(
   meson.project_name(),
-  sources,
+  sources: ['src/app.cpp'],
   include_directories: ['src/'],
   dependencies: deps,
+  cpp_pch: 'src/shared_pch.hpp'
+)
+
+executable(
+  'benchmark-toy',
+  sources: ['src/benchmark.cpp'],
+  include_directories: ['src/'],
+  dependencies: deps + dependency('benchmark-main'),
   cpp_pch: 'src/shared_pch.hpp'
 )
