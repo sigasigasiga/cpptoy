@@ -279,10 +279,7 @@ private:
 
 template<typename F>
 class [[nodiscard]] compose<F> : public stored_func_invoker<F>
-{
-public:
-    using stored_func_invoker<F>::stored_func_invoker;
-};
+{};
 
 template<typename F>
 compose(F) -> compose<F>;
@@ -366,10 +363,7 @@ public:
 
 template<typename F>
 class [[nodiscard]] make_bind_expression : public stored_func_invoker<F>
-{
-public:
-    using stored_func_invoker<F>::stored_func_invoker;
-};
+{};
 
 template<typename F>
 make_bind_expression(F) -> make_bind_expression<F>;
