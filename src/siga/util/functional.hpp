@@ -185,12 +185,12 @@ public:
     using return_type = void;
 
 public:
-    constexpr void operator()() noexcept {}
+    constexpr return_type operator()() noexcept {}
 };
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename F>
+template<std::invocable F>
 class [[nodiscard]] ignore_args
 {
 public:
@@ -205,6 +205,29 @@ public:
         noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>>)
     {
         return std::invoke(std::forward<Self>(self).func_);
+    }
+
+private:
+    F func_;
+};
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename F>
+class [[nodiscard]] stored_func_invoker
+{
+public:
+    constexpr stored_func_invoker(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : func_{std::move(func)}
+    {
+    }
+
+public:
+    template<typename Self, typename... Args>
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
+    {
+        return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
     }
 
 private:
@@ -249,30 +272,20 @@ public:
     // clang-format on
 
 private:
+    // TODO: take advantage of EBCO?
     F func_;
     rest_t rest_;
 };
 
 template<typename F>
-class [[nodiscard]] compose<F>
+class [[nodiscard]] compose<F> : public stored_func_invoker<F>
 {
 public:
-    constexpr compose(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : func_{std::move(func)}
-    {
-    }
-
-public:
-    template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
-        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
-    {
-        return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
-    }
-
-private:
-    F func_;
+    using stored_func_invoker<F>::stored_func_invoker;
 };
+
+template<typename F>
+compose(F) -> compose<F>;
 
 // ------------------------------------------------------------------------------------------------
 
@@ -352,25 +365,14 @@ public:
 // ------------------------------------------------------------------------------------------------
 
 template<typename F>
-class [[nodiscard]] make_bind_expression
+class [[nodiscard]] make_bind_expression : public stored_func_invoker<F>
 {
 public:
-    constexpr make_bind_expression(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : func_{std::move(func)}
-    {
-    }
-
-public:
-    template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
-        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
-    {
-        return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
-    }
-
-private:
-    F func_;
+    using stored_func_invoker<F>::stored_func_invoker;
 };
+
+template<typename F>
+make_bind_expression(F) -> make_bind_expression<F>;
 
 // ------------------------------------------------------------------------------------------------
 

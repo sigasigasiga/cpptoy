@@ -5,14 +5,14 @@ namespace siga {
 void first_benchmark(benchmark::State &state)
 {
     for(auto _ : state) {
-        std::string s;
+        benchmark::DoNotOptimize(std::string{});
     }
 }
 
 void second_benchmark(benchmark::State &state)
 {
     for(auto _ : state) {
-        std::string s;
+        benchmark::DoNotOptimize(std::string{});
     }
 }
 
