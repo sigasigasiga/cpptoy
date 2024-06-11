@@ -47,13 +47,15 @@ private:
 template<sftb_makeable T>
 class shared_from_this_base::make_shared_impl
 {
+private:
+    using access_tag = shared_from_this_base::access_tag;
+
 public:
     template<typename... Args>
-    requires std::constructible_from<T, shared_from_this_base::access_tag, Args &&...>
+    requires std::constructible_from<T, access_tag, Args &&...>
     static std::shared_ptr<T> operator()(Args &&...args)
     {
-        auto s =
-            std::make_shared<T>(shared_from_this_base::access_tag{}, std::forward<Args>(args)...);
+        auto s = std::make_shared<T>(access_tag{}, std::forward<Args>(args)...);
         s->weak_this_ = s;
         return s;
     }
