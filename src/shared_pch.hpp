@@ -48,6 +48,7 @@
 #include "siga/util/functional.hpp"
 #include "siga/util/iterator.hpp"
 #include "siga/util/meta.hpp"
+#include "siga/util/shared_from_this_base.hpp"
 #include "siga/util/toy.hpp"
 #include "siga/util/tuple.hpp"
 #include "siga/util/utility.hpp"
