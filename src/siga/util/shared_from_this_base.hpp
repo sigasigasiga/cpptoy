@@ -2,6 +2,24 @@
 
 namespace siga::util {
 
+// `std::enable_shared_from_this` requires its derived classes (let's call one `A`)
+// to have some sort of static method that would construct an instance of the class.
+//
+// this approach has some problems:
+// 1. boilerplate
+// 2. it doesn't work great if we want to derive from `A`
+// 3. it makes `std::make_shared` usage tricky
+// 4. if we want to inherit from multiple classes that are derived from esft,
+//    everything becomes a huge mess, and there are no ways to fix that
+//    because it is impossible to inherit from it virtually
+//
+// `shared_from_this_base` solves these problems:
+// 1. the only thing that sftb-derived classes need to do
+//    is to put `access_tag` as the first constructor argument and init the base class with it
+// 2. classes that are derived from `A` also need to put `access_tag` as the first constructor arg,
+//    and then they should forward it to the derived class
+// 3. `util::make_shared` becomes the only way to construct it and it is optimal
+// 4. virtual inheritance from sftb is easy
 class shared_from_this_base;
 
 template<typename T>
