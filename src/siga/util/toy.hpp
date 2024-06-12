@@ -4,13 +4,13 @@
 
 namespace siga::util {
 
-template<typename>
+template<typename...>
 struct type_print;
 
 template<typename T>
 type_print<T> print_type(const T &);
 
-template<auto>
+template<auto...>
 struct value_print;
 
 // ------------------------------------------------------------------------------------------------

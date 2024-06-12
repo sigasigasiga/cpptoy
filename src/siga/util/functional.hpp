@@ -236,6 +236,19 @@ private:
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename ArgsTuple, typename F, typename... RestF>
+decltype(auto) invoke_sequentially(ArgsTuple &&args, F &&func, RestF &&...rest)
+{
+    if constexpr(sizeof...(rest) == 0) {
+        return std::apply(std::forward<F>(func), std::forward<ArgsTuple>(args));
+    } else {
+        return invoke_sequentially(
+            std::forward_as_tuple(std::apply(std::forward<F>(func), std::forward<ArgsTuple>(args))),
+            std::forward<RestF>(rest)...
+        );
+    }
+}
+
 template<typename F, typename... RestF>
 class [[nodiscard]] compose
 {
