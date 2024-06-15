@@ -77,6 +77,8 @@ public:
         friend class make_shared_with_sftb_tag;
     };
 
+    // TODO: should we mark `shared_from_this` as `noexcept`?
+
 protected:
     constexpr explicit shared_from_this_base(sftb_tag) noexcept {}
 };

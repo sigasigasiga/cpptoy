@@ -7,11 +7,17 @@ namespace siga::util {
 template<typename...>
 struct type_print;
 
-template<typename T>
-type_print<T> print_type(const T &);
-
 template<auto...>
 struct value_print;
+
+template<typename... Ts>
+type_print<Ts...> print();
+
+template<typename... Ts>
+type_print<Ts...> print(const Ts &...);
+
+template<auto... Vs>
+value_print<Vs...> print();
 
 // ------------------------------------------------------------------------------------------------
 
@@ -130,5 +136,10 @@ constexpr value_tag<V> make_tag() noexcept
 {
     return {};
 }
+
+// ------------------------------------------------------------------------------------------------
+
+struct empty
+{};
 
 } // namespace siga::util
