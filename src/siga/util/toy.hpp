@@ -79,6 +79,37 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
+class cvref_type_string_t
+{
+public:
+    // clang-format off
+    constexpr static std::string_view operator()(auto &) noexcept { return "auto &"; }
+    constexpr static std::string_view operator()(const auto &) noexcept { return "const auto &"; }
+    constexpr static std::string_view operator()(volatile auto &) noexcept { return "volatile auto &"; }
+    constexpr static std::string_view operator()(const volatile auto &) noexcept { return "const volatile auto &"; }
+    constexpr static std::string_view operator()(auto &&) noexcept { return "auto &&"; }
+    constexpr static std::string_view operator()(const auto &&) noexcept { return "const auto &&"; }
+    constexpr static std::string_view operator()(volatile auto &&) noexcept { return "volatile auto &&"; }
+    constexpr static std::string_view operator()(const volatile auto &&) noexcept { return "const volatile auto &&"; }
+    // clang-format on
+};
+
+inline constexpr cvref_type_string_t cvref_type_string;
+
+// ------------------------------------------------------------------------------------------------
+
+class printing_invoker
+{
+public:
+    template<typename Self>
+    void operator()(this Self &&self)
+    {
+        std::cout << cvref_type_string(std::forward<Self>(self)) << std::endl;
+    }
+};
+
+// ------------------------------------------------------------------------------------------------
+
 class ignore_t
 {
 public:
