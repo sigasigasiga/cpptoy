@@ -236,8 +236,10 @@ private:
 
 // ------------------------------------------------------------------------------------------------
 
+// TODO: noexcept
+// TODO: constrain `F` with `invocable` concept
 template<typename ArgsTuple, typename F, typename... RestF>
-decltype(auto) invoke_sequentially(ArgsTuple &&args, F &&func, RestF &&...rest)
+constexpr decltype(auto) invoke_sequentially(ArgsTuple &&args, F &&func, RestF &&...rest)
 {
     if constexpr(sizeof...(rest) == 0) {
         return std::apply(std::forward<F>(func), std::forward<ArgsTuple>(args));
@@ -249,53 +251,44 @@ decltype(auto) invoke_sequentially(ArgsTuple &&args, F &&func, RestF &&...rest)
     }
 }
 
-template<typename F, typename... RestF>
+template<typename... Fs>
 class [[nodiscard]] compose
 {
-private:
-    using rest_t = compose<RestF...>;
-
 public:
-    constexpr compose(
-        F func,
-        RestF... rest_funcs
-    ) noexcept(std::is_nothrow_move_constructible_v<F> && std::is_nothrow_constructible_v<rest_t, RestF...>)
-        : func_{std::move(func)}
-        , rest_{std::move(rest_funcs)...}
+    constexpr compose(Fs... funcs) noexcept((... && std::is_nothrow_move_constructible_v<Fs>))
+        : funcs_{std::move(funcs)...}
     {
     }
 
 public:
-    // clang-format off
+    // TODO: noexcept
     template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(
-        this Self &&self,
-        Args &&...args
-    )
-        noexcept(
-            std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...> &&
-            std::is_nothrow_invocable_v<rest_t, std::invoke_result_t<copy_cv_ref_t<Self, F>, Args &&...>>
-        )
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
     {
-        return std::invoke(
-            std::forward<Self>(self).rest_,
-            std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...)
+        return std::forward<Self>(self).invoke_sequentially_impl(
+            std::forward_as_tuple(std::forward<Args>(args)...),
+            std::index_sequence_for<Fs...>()
+        );
+    }
+
+private:
+    // clang-format off
+    template<typename Self, typename ArgsTuple, std::size_t... Is>
+    constexpr decltype(auto) invoke_sequentially_impl(
+        this Self &&self,
+        ArgsTuple &&args,
+        std::index_sequence<Is...>
+    ) {
+        return invoke_sequentially(
+            std::forward<ArgsTuple>(args),
+            std::get<Is>(std::forward<Self>(self).funcs_)...
         );
     }
     // clang-format on
 
 private:
-    // TODO: take advantage of EBCO?
-    F func_;
-    rest_t rest_;
+    std::tuple<Fs...> funcs_;
 };
-
-template<typename F>
-class [[nodiscard]] compose<F> : public stored_func_invoker<F>
-{};
-
-template<typename F>
-compose(F) -> compose<F>;
 
 // ------------------------------------------------------------------------------------------------
 
