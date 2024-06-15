@@ -8,24 +8,6 @@ concept conceptify = Trait<T>::value;
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename Tuple, std::size_t I>
-concept index_gettable = requires(Tuple tuple) {
-    { get<I>(tuple) } -> std::convertible_to<std::tuple_element_t<I, Tuple>>;
-};
-
-template<typename T>
-concept tuple_like =
-    []<std::size_t... Is>(std::index_sequence<Is...>) constexpr {
-        // note that `get<Type>(tuple)` is not always available for `std::tuple`
-        // and is never available for `std::array` which is also tuple-like
-        return (... && index_gettable<T, Is>);
-    }(
-        // compiler error messages are better if we don't use `std::tuple_size_v`
-        std::make_index_sequence<std::tuple_size<T>::value>{}
-    );
-
-// ------------------------------------------------------------------------------------------------
-
 template<typename T, template<typename...> typename Trait, template<typename...> typename... Rest>
 class combine_traits
 {
