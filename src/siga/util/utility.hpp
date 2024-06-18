@@ -20,7 +20,8 @@ inline constexpr copy_t copy;
 // ------------------------------------------------------------------------------------------------
 
 // unlike `copy_t`, the return value may be move-constructed
-class [[nodiscard]] decay_value_t
+// https://en.cppreference.com/w/cpp/standard_library/decay-copy
+class [[nodiscard]] decay_copy_t
 {
 public:
     template<typename T>
@@ -31,7 +32,7 @@ public:
     }
 };
 
-inline constexpr decay_value_t decay_value;
+inline constexpr decay_copy_t decay_copy;
 
 // ------------------------------------------------------------------------------------------------
 
@@ -59,7 +60,7 @@ inline constexpr cut_rvalue_ref_t cut_rvalue_ref;
 template<typename F>
 [[nodiscard]] constexpr auto decay_return(F &&func)
 {
-    return compose(std::forward<F>(func), decay_value);
+    return compose(std::forward<F>(func), decay_copy);
 }
 
 // ------------------------------------------------------------------------------------------------
