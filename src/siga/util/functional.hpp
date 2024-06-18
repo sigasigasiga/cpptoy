@@ -13,11 +13,19 @@ public:
     [[nodiscard]] static constexpr T operator()(Args &&...args)
         noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
     {
-        if constexpr(UseRoundBrackets) {
-            return T(std::forward<Args>(args)...);
-        } else {
-            return T{std::forward<Args>(args)...};
-        }
+        return T(std::forward<Args>(args)...);
+    }
+};
+
+template<typename T>
+class [[nodiscard]] construct_t<T, false>
+{
+public:
+    template<typename... Args>
+    [[nodiscard]] static constexpr T operator()(Args &&...args)
+        noexcept(noexcept(T{std::forward<Args>(args)...}))
+    {
+        return T{std::forward<Args>(args)...};
     }
 };
 
