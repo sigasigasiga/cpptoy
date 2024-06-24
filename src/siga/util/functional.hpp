@@ -327,6 +327,7 @@ inline constexpr fold_invoke_t fold_invoke;
 
 template<typename... Fs>
 [[nodiscard]] auto compose(Fs &&...fs)
+    noexcept((... && std::is_nothrow_constructible_v<std::decay_t<Fs>, Fs &&>))
 {
     return std::bind_front(fold_invoke, std::tuple{std::forward<Fs>(fs)...});
 }
