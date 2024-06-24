@@ -57,7 +57,7 @@ public:
         if(str[N - 1] == '\0') {
             std::ranges::copy(str, std::ranges::begin(data));
         } else {
-            throw std::logic_error{"the string must be null-terminated"};
+            throw std::invalid_argument{"the string must be null-terminated"};
         }
     }
 
