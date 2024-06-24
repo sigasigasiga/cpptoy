@@ -29,6 +29,18 @@ concept tuple_like =
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename Tuple, std::size_t I>
+class tuple_get_type
+{
+public:
+    using type = decltype(get<I>(std::declval<Tuple>()));
+};
+
+template<typename Tuple, std::size_t I>
+using tuple_get_type_t = tuple_get_type<Tuple, I>::type;
+
+// ------------------------------------------------------------------------------------------------
+
 template<typename F, typename Tuple>
 concept applyable = requires(F &&func, Tuple &&tuple) {
     std::apply(std::forward<F>(func), std::forward<Tuple>(tuple));

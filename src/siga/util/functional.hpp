@@ -245,59 +245,49 @@ private:
 
 // ------------------------------------------------------------------------------------------------
 
-// TODO: noexcept
-template<typename ArgsTuple, typename F, typename... RestF>
-requires tuple_like<std::decay_t<ArgsTuple>> && applyable<F, ArgsTuple>
-constexpr decltype(auto) invoke_sequentially(ArgsTuple &&args, F &&func, RestF &&...rest)
+class [[nodiscard]] fold_invoke_t
 {
-    if constexpr(sizeof...(rest) == 0) {
-        return std::apply(std::forward<F>(func), std::forward<ArgsTuple>(args));
-    } else {
-        return invoke_sequentially(
-            std::forward_as_tuple(std::apply(std::forward<F>(func), std::forward<ArgsTuple>(args))),
-            std::forward<RestF>(rest)...
-        );
-    }
-}
-
-template<typename... Fs>
-class [[nodiscard]] compose
-{
-public:
-    constexpr compose(Fs... funcs) noexcept((... && std::is_nothrow_move_constructible_v<Fs>))
-        : funcs_{std::move(funcs)...}
-    {
-    }
-
 public:
     // TODO: noexcept
-    template<typename Self, typename... Args>
-    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
+    template<typename FuncTuple, typename... Args>
+    static constexpr decltype(auto) operator()(FuncTuple &&funcs, Args &&...args)
     {
-        return std::forward<Self>(self).invoke_sequentially_impl(
-            std::forward_as_tuple(std::forward<Args>(args)...),
-            std::index_sequence_for<Fs...>()
+        return impl(
+            std::make_index_sequence<std::tuple_size_v<std::decay_t<FuncTuple>>>{},
+            std::forward<FuncTuple>(funcs),
+            std::forward<Args>(args)...
         );
     }
 
 private:
     // clang-format off
-    template<typename Self, typename ArgsTuple, std::size_t... Is>
-    constexpr decltype(auto) invoke_sequentially_impl(
-        this Self &&self,
-        ArgsTuple &&args,
-        std::index_sequence<Is...>
+    template<typename FsTuple, std::size_t I, std::size_t... Is, typename... Args>
+    requires std::invocable<tuple_get_type_t<FsTuple &&, I>, Args &&...>
+    static constexpr decltype(auto) impl(
+        std::index_sequence<I, Is...>,
+        FsTuple &&fs,
+        Args &&...args
     ) {
-        return invoke_sequentially(
-            std::forward<ArgsTuple>(args),
-            std::get<Is>(std::forward<Self>(self).funcs_)...
-        );
+        if constexpr(sizeof...(Is) == 0) {
+            return std::invoke(get<I>(std::forward<FsTuple>(fs)), std::forward<Args>(args)...);
+        } else {
+            return impl(
+                std::index_sequence<Is...>{},
+                std::forward<FsTuple>(fs),
+                std::invoke(get<I>(std::forward<FsTuple>(fs)), std::forward<Args>(args)...)
+            );
+        }
     }
     // clang-format on
-
-private:
-    std::tuple<Fs...> funcs_;
 };
+
+inline constexpr fold_invoke_t fold_invoke;
+
+template<typename... Fs>
+[[nodiscard]] auto compose(Fs &&...fs)
+{
+    return std::bind_front(fold_invoke, std::tuple{std::forward<Fs>(fs)...});
+}
 
 // ------------------------------------------------------------------------------------------------
 
