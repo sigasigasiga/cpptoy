@@ -164,6 +164,29 @@ private:
 // ------------------------------------------------------------------------------------------------
 
 template<typename T>
+class [[nodiscard]] index
+{
+public:
+    constexpr index(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
+        : data_{std::move(data)}
+    {
+    }
+
+public:
+    template<typename Self, typename Arr>
+    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Arr &&array)
+        noexcept(noexcept(std::forward<Arr>(array)[get_reference(std::forward<Self>(self).data_)]))
+    {
+        return std::forward<Arr>(array)[get_reference(std::forward<Self>(self).data_)];
+    }
+
+private:
+    T data_;
+};
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename T>
 class [[nodiscard]] return_value
 {
 public:
