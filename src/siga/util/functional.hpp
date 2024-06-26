@@ -163,25 +163,50 @@ private:
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename T>
-class [[nodiscard]] index
+template<typename Idx>
+class [[nodiscard]] index_with
 {
 public:
-    constexpr index(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)}
+    constexpr index_with(Idx idx) noexcept(std::is_nothrow_move_constructible_v<Idx>)
+        : idx_{std::move(idx)}
     {
     }
 
 public:
-    template<typename Self, typename Arr>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Arr &&array)
-        noexcept(noexcept(std::forward<Arr>(array)[get_reference(std::forward<Self>(self).data_)]))
+    template<typename Self, typename Container>
+    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Container &&container)
+        noexcept(noexcept(std::forward<Container>(container
+        )[get_reference(std::forward<Self>(self).idx_)]))
     {
-        return std::forward<Arr>(array)[get_reference(std::forward<Self>(self).data_)];
+        return std::forward<Container>(container)[get_reference(std::forward<Self>(self).idx_)];
     }
 
 private:
-    T data_;
+    Idx idx_;
+};
+
+// ------------------------------------------------------------------------------------------------
+
+template<typename Container>
+class [[nodiscard]] index_in
+{
+public:
+    constexpr index_in(Container container)
+        noexcept(std::is_nothrow_move_constructible_v<Container>)
+        : container_{std::move(container)}
+    {
+    }
+
+public:
+    // TODO: noexcept
+    template<typename Self, typename Idx>
+    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Idx &&idx)
+    {
+        return get_reference(std::forward<Self>(self).container_)[std::forward<Idx>(idx)];
+    }
+
+private:
+    Container container_;
 };
 
 // ------------------------------------------------------------------------------------------------
