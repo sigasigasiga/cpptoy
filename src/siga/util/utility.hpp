@@ -19,6 +19,13 @@ inline constexpr copy_t copy;
 
 // ------------------------------------------------------------------------------------------------
 
+template<typename T>
+class is_nothrow_decay_copyable : public std::is_nothrow_constructible<std::decay_t<T>, T &&>
+{};
+
+template<typename T>
+constexpr bool is_nothrow_decay_copyable_v = is_nothrow_decay_copyable<T>::value;
+
 // unlike `copy_t`, the return value may be move-constructed
 // https://en.cppreference.com/w/cpp/standard_library/decay-copy
 class [[nodiscard]] decay_copy_t
@@ -26,7 +33,7 @@ class [[nodiscard]] decay_copy_t
 public:
     template<typename T>
     [[nodiscard]] static constexpr std::decay_t<T> operator()(T &&value)
-        noexcept(std::is_nothrow_constructible_v<std::decay_t<T>, T &&>)
+        noexcept(is_nothrow_decay_copyable_v<T>)
     {
         return value;
     }

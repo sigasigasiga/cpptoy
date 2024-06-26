@@ -117,96 +117,43 @@ inline constexpr get_reference_t get_reference;
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename T>
-class [[nodiscard]] equal_to
+template<typename F>
+class [[nodiscard]] unwrap_args
 {
 public:
-    constexpr equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)}
+    constexpr unwrap_args(F fn) noexcept(std::is_nothrow_move_constructible_v<F>)
+        : fn_{std::move(fn)}
     {
     }
 
 public:
-    template<typename Self, typename Rhs>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
-        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs)))
+    template<typename Self, typename... Args>
+    constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
+        noexcept(std::is_nothrow_invocable_v<
+                 copy_cv_ref_t<Self, F>,
+                 std::unwrap_reference_t<Args>...>)
     {
-        return get_reference(std::forward<Self>(self).data_) == std::forward<Rhs>(rhs);
+        return std::invoke(
+            std::forward<Self>(self).fn_,
+            get_reference(std::forward<Args>(args))...
+        );
     }
 
 private:
-    T data_;
+    F fn_;
 };
 
 // ------------------------------------------------------------------------------------------------
 
-template<typename T>
-class [[nodiscard]] not_equal_to
+class [[nodiscard]] subscript
 {
 public:
-    constexpr not_equal_to(T data) noexcept(std::is_nothrow_move_constructible_v<T>)
-        : data_{std::move(data)}
+    template<typename L, typename R>
+    [[nodiscard]] static constexpr decltype(auto) operator()(L &&lhs, R &&rhs)
+        noexcept(noexcept(std::forward<L>(lhs)[std::forward<R>(rhs)]))
     {
+        return std::forward<L>(lhs)[std::forward<R>(rhs)];
     }
-
-public:
-    template<typename Self, typename Rhs>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Rhs &&rhs)
-        noexcept(noexcept(get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs)))
-    {
-        return get_reference(std::forward<Self>(self).data_) != std::forward<Rhs>(rhs);
-    }
-
-private:
-    T data_;
-};
-
-// ------------------------------------------------------------------------------------------------
-
-template<typename Idx>
-class [[nodiscard]] index_with
-{
-public:
-    constexpr index_with(Idx idx) noexcept(std::is_nothrow_move_constructible_v<Idx>)
-        : idx_{std::move(idx)}
-    {
-    }
-
-public:
-    template<typename Self, typename Container>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Container &&container)
-        noexcept(noexcept(std::forward<Container>(container
-        )[get_reference(std::forward<Self>(self).idx_)]))
-    {
-        return std::forward<Container>(container)[get_reference(std::forward<Self>(self).idx_)];
-    }
-
-private:
-    Idx idx_;
-};
-
-// ------------------------------------------------------------------------------------------------
-
-template<typename Container>
-class [[nodiscard]] index_in
-{
-public:
-    constexpr index_in(Container container)
-        noexcept(std::is_nothrow_move_constructible_v<Container>)
-        : container_{std::move(container)}
-    {
-    }
-
-public:
-    // TODO: noexcept
-    template<typename Self, typename Idx>
-    [[nodiscard]] constexpr decltype(auto) operator()(this Self &&self, Idx &&idx)
-    {
-        return get_reference(std::forward<Self>(self).container_)[std::forward<Idx>(idx)];
-    }
-
-private:
-    Container container_;
 };
 
 // ------------------------------------------------------------------------------------------------
