@@ -127,17 +127,20 @@ public:
     }
 
 public:
+    // clang-format off
     template<typename Self, typename... Args>
     constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
-        noexcept(std::is_nothrow_invocable_v<
-                 copy_cv_ref_t<Self, F>,
-                 std::unwrap_reference_t<Args>...>)
+        noexcept(noexcept(std::invoke(
+            std::forward<Self>(self).fn_,
+            get_reference(std::forward<Args>(args))...
+        )))
     {
         return std::invoke(
             std::forward<Self>(self).fn_,
             get_reference(std::forward<Args>(args))...
         );
     }
+    // clang-format on
 
 private:
     F fn_;

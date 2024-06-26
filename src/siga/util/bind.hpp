@@ -1,5 +1,8 @@
 #pragma once
 
+#include "siga/util/functional.hpp"
+#include "siga/util/utility.hpp"
+
 namespace siga::util {
 
 template<typename F, typename... Args>
@@ -36,7 +39,6 @@ template<typename T>
 
 // ------------------------------------------------------------------------------------------------
 
-// TODO: there's a (compiler?) bug where it won't compile if a container is wrapped in `std::ref`
 template<typename Container>
 [[nodiscard]] constexpr auto index_in(Container &&container)
     noexcept(noexcept(bind_front_unwrap(subscript(), std::forward<Container>(container))))

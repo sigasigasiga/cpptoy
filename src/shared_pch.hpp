@@ -45,6 +45,7 @@
 #include <tl/optional.hpp>
 
 // my includes
+#include "siga/util/bind.hpp"
 #include "siga/util/functional.hpp"
 #include "siga/util/iterator.hpp"
 #include "siga/util/meta.hpp"
