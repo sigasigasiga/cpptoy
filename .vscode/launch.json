@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
-            "name": "LLDB",
-            "program": "${workspaceFolder}/bin/toy",
+            "name": "(vsc) Launch file",
+            "program": "${workspaceFolder}/bin/toy.exe",
             "args": "",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build"
