@@ -79,7 +79,7 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
-class cvref_type_string_t
+class [[nodiscard]] cvref_type_string_t
 {
 public:
     // clang-format off
@@ -98,7 +98,7 @@ inline constexpr cvref_type_string_t cvref_type_string;
 
 // ------------------------------------------------------------------------------------------------
 
-class printing_invoker
+class [[nodiscard]] printing_invoker
 {
 public:
     template<typename Self>
@@ -110,7 +110,7 @@ public:
 
 // ------------------------------------------------------------------------------------------------
 
-class ignore_t
+class [[nodiscard]] ignore_t
 {
 public:
     constexpr const ignore_t &operator=(auto &&) const noexcept { return *this; }
@@ -170,7 +170,7 @@ constexpr value_tag<V> make_tag() noexcept
 
 // ------------------------------------------------------------------------------------------------
 
-struct empty
+struct [[nodiscard]] empty
 {};
 
 } // namespace siga::util

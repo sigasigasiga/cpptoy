@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "cppdbg",
+            "type": "cppvsdbg",
             "request": "launch",
             "name": "(vsc) Launch file",
             "program": "${workspaceFolder}/bin/toy.exe",
