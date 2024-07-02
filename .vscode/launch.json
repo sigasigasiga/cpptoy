@@ -9,6 +9,15 @@
             "args": "",
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "Build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "(lldb) Launch file",
+            "program": "${workspaceFolder}/bin/toy",
+            "args": "",
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "Build"
         }
     ]
 }
