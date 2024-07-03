@@ -231,6 +231,9 @@ public:
 
 public:
     template<typename Self, typename... Args>
+    requires requires(Self &&self, Args &&...args) {
+        std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
+    }
     constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
         noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
     {
@@ -240,6 +243,14 @@ public:
 private:
     F func_;
 };
+
+template<typename F>
+requires std::is_empty_v<F> && (!std::is_final_v<F>)
+class [[nodiscard]] stored_func_invoker<F> : public F
+{};
+
+template<typename F>
+stored_func_invoker(F) -> stored_func_invoker<F>;
 
 // ------------------------------------------------------------------------------------------------
 
