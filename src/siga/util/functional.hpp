@@ -38,7 +38,7 @@ class [[nodiscard]] indirect_t
 {
 public:
     template<typename T>
-    static constexpr decltype(auto) operator()(T &&object)
+    [[nodiscard]] static constexpr decltype(auto) operator()(T &&object)
         noexcept(noexcept(*std::forward<T>(object)))
     {
         return *std::forward<T>(object);
@@ -229,15 +229,19 @@ public:
     }
 
 public:
+    // clang-format off
     template<typename Self, typename... Args>
     requires requires(Self &&self, Args &&...args) {
         std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
     }
     constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
-        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>, Args &&...>)
+        noexcept(noexcept(
+            std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...)
+        ))
     {
         return std::invoke(std::forward<Self>(self).func_, std::forward<Args>(args)...);
     }
+    // clang-format on
 
 private:
     F func_;
@@ -416,6 +420,7 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
         static                                                                                     \
         noexcept(noexcept(X(std::forward<Args>(args)...)))                                         \
         -> decltype(auto)                                                                          \
+        requires requires { X(std::forward<Args>(args)...); }                                      \
     {                                                                                              \
         return X(std::forward<Args>(args)...);                                                     \
     }
