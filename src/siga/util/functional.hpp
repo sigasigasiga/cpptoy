@@ -106,10 +106,9 @@ public:
     }
 
     template<typename T>
-    [[nodiscard]] static constexpr decltype(auto) operator()(std::reference_wrapper<T> value
-    ) noexcept
+    [[nodiscard]] static constexpr decltype(auto) operator()(std::reference_wrapper<T> ref) noexcept
     {
-        return value.get();
+        return ref.get();
     }
 };
 
@@ -425,13 +424,41 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
 // ------------------------------------------------------------------------------------------------
 
 // clang-format off
-#define SIGA_UTIL_LIFT_MEM_FN(METHOD)                                                              \
-    []<typename Object, typename... Args>(Object &&object, Args &&...args)                         \
+#define SIGA_UTIL_LIFT_MEMBER(MEMBER)                                                              \
+    []<typename T, typename... Args>                                                               \
+        (T &&value, Args &&...args)                                                                \
         constexpr                                                                                  \
         static                                                                                     \
-        noexcept(noexcept(std::declval<Object>().METHOD(std::declval<Args>()...)))                 \
+        noexcept(                                                                                  \
+            !requires {                                                                            \
+                std::forward<T>(value).MEMBER(std::forward<Args>(args)...);                        \
+            }                                                                                      \
+            ||                                                                                     \
+            requires {                                                                             \
+                requires(noexcept(std::forward<T>(value).MEMBER(std::forward<Args>(args)...)));    \
+            }                                                                                      \
+        )                                                                                          \
         -> decltype(auto)                                                                          \
     {                                                                                              \
-        return std::forward<Object>(object).METHOD(std::forward<Args>(args)...);                   \
+        constexpr bool is_method = requires {                                                      \
+            /* FIXME?: if `MEMBER` is a niebloid, it'd behave not as one may expect */             \
+            std::forward<T>(value).MEMBER(std::forward<Args>(args)...);                            \
+        };                                                                                         \
+                                                                                                   \
+        constexpr bool is_field = requires {                                                       \
+            std::forward<T>(value).MEMBER;                                                         \
+        };                                                                                         \
+                                                                                                   \
+        if constexpr(is_method) {                                                                  \
+            return std::forward<T>(value).MEMBER(std::forward<Args>(args)...);                     \
+        } else if constexpr(is_field) {                                                            \
+            /* Parenthesis around needed for `decltype(auto)` */                                   \
+            return (std::forward<T>(value).MEMBER);                                                \
+        } else {                                                                                   \
+            static_assert(                                                                         \
+                false,                                                                             \
+                "`" #MEMBER "` is not a field or it cannot be invoked with this set of arguments"  \
+            );                                                                                     \
+        }                                                                                          \
     }
 // clang-format on
