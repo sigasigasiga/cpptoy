@@ -17,7 +17,7 @@ public:
 
 inline constexpr copy_t copy;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename T>
 class is_nothrow_decay_copyable : public std::is_nothrow_constructible<std::decay_t<T>, T &&>
@@ -41,7 +41,7 @@ public:
 
 inline constexpr decay_copy_t decay_copy;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 class [[nodiscard]] cut_rvalue_ref_t
 {
@@ -61,7 +61,7 @@ public:
 
 inline constexpr cut_rvalue_ref_t cut_rvalue_ref;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // useful for `std::optional::transform`
 template<typename F>
@@ -70,7 +70,7 @@ template<typename F>
     return compose(std::forward<F>(func), decay_copy);
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 // useful for `tl::optional::transform`,
 // although i think it should replace `T&&` with `T` automatically

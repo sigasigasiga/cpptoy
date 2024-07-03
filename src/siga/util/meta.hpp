@@ -6,7 +6,7 @@ namespace siga::util {
 template<typename T, template<typename...> typename Trait>
 concept conceptify = Trait<T>::value;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename T, template<typename...> typename Trait, template<typename...> typename... Rest>
 class combine_traits
@@ -34,13 +34,13 @@ static_assert(
 );
 #endif
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename... Ts>
 class [[nodiscard]] type_list
 {};
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<std::size_t N>
 struct [[nodiscard]] string_literal
@@ -69,7 +69,7 @@ public:
     char data[N] = {};
 };
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_const
@@ -89,7 +89,7 @@ public:
 template<typename From, typename To>
 using copy_const_t = copy_const<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_volatile
@@ -108,7 +108,7 @@ public:
 template<typename From, typename To>
 using copy_volatile_t = copy_volatile<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_cv
@@ -120,7 +120,7 @@ public:
 template<typename From, typename To>
 using copy_cv_t = copy_cv<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_lvalue_ref
@@ -139,7 +139,7 @@ public:
 template<typename From, typename To>
 using copy_lvalue_ref_t = copy_lvalue_ref<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_rvalue_ref
@@ -160,7 +160,7 @@ public:
 template<typename From, typename To>
 using copy_rvalue_ref_t = copy_rvalue_ref<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_ref
@@ -172,7 +172,7 @@ public:
 template<typename From, typename To>
 using copy_ref_t = copy_ref<From, To>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename From, typename To>
 class copy_cv_ref

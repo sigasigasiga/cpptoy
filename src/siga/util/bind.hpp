@@ -20,7 +20,7 @@ template<typename F, typename... Args>
     return ranges::bind_back(unwrap_args(std::forward<F>(f)), std::forward<Args>(args)...);
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename T>
 [[nodiscard]] constexpr auto equal_to(T &&value)
@@ -29,7 +29,7 @@ template<typename T>
     return bind_front_unwrap(std::equal_to(), std::forward<T>(value));
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename T>
 [[nodiscard]] constexpr auto not_equal_to(T &&value)
@@ -38,7 +38,7 @@ template<typename T>
     return bind_front_unwrap(std::not_equal_to(), std::forward<T>(value));
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename Container>
 [[nodiscard]] constexpr auto index_in(Container &&container)
@@ -47,7 +47,7 @@ template<typename Container>
     return bind_front_unwrap(subscript(), std::forward<Container>(container));
 }
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename Idx>
 [[nodiscard]] constexpr auto index_with(Idx &&idx)

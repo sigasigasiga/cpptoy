@@ -2,7 +2,7 @@
 
 namespace siga::util {
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename Tuple, std::size_t I>
 concept index_gettable = requires(Tuple tuple) {
@@ -27,7 +27,7 @@ concept tuple_like =
         std::make_index_sequence<std::tuple_size<T>::value>{}
     );
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename Tuple, std::size_t I>
 class tuple_get_type
@@ -39,14 +39,14 @@ public:
 template<typename Tuple, std::size_t I>
 using tuple_get_type_t = tuple_get_type<Tuple, I>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename F, typename Tuple>
 concept applyable = requires(F &&func, Tuple &&tuple) {
     std::apply(std::forward<F>(func), std::forward<Tuple>(tuple));
 };
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename F, typename Tuple>
 class apply_result
@@ -58,7 +58,7 @@ public:
 template<typename F, typename Tuple>
 using apply_result_t = apply_result<F, Tuple>::type;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename F, typename Tuple>
 class is_nothrow_applyable
@@ -70,7 +70,7 @@ public:
 template<typename F, typename Tuple>
 inline constexpr bool is_nothrow_applyable_v = is_nothrow_applyable<F, Tuple>::value;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 class [[nodiscard]] for_each_in_parameter_pack_t
 {
@@ -95,7 +95,7 @@ public:
 
 inline constexpr for_each_in_parameter_pack_t for_each_in_parameter_pack;
 
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 class [[nodiscard]] for_each_in_tuple_t
 {
