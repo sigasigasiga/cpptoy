@@ -4,23 +4,24 @@
         {
             "type": "cppvsdbg",
             "request": "launch",
-            "name": "(vsc) Launch file",
+            "name": "(vsdbg) Launch file",
             "program": "${workspaceFolder}/bin/toy.exe",
-            "args": "",
+            "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "preLaunchTask": "Build"
         },
         {
             "type": "lldb-dap",
             "request": "launch",
             "name": "(lldb) Launch file",
             "program": "${workspaceFolder}/bin/toy",
-            "args": "",
+            "args": [],
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build",
             "internalConsoleOptions": "openOnSessionStart",
-            "runInTerminal": true
+            "runInTerminal": true,
+            "preLaunchTask": "Build"
         }
     ]
 }
