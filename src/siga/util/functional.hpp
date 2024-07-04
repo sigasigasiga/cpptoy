@@ -429,24 +429,31 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
 // -------------------------------------------------------------------------------------------------
 
 // clang-format off
+
+// Known limitations:
+// 1. Resulting lambda never produces an overload set.
+//    That is, if passed to `util::overload`, the result may be surprising
+// 2. If `MEMBER` is a niebloid, it'd be called,
+//    despite the fact that `std::invoke` would return a reference to it.
+//    While this is probably fixable, I'm not sure if it's worth the effort
+// 
+// TODO: should we also specify a class name? If so, don't forget that types must be _compatible_
 #define SIGA_UTIL_LIFT_MEMBER(MEMBER)                                                              \
     []<typename T, typename... Args>                                                               \
         (T &&value, Args &&...args)                                                                \
         constexpr                                                                                  \
         static                                                                                     \
         noexcept(                                                                                  \
-            !requires {                                                                            \
-                std::forward<T>(value).MEMBER(std::forward<Args>(args)...);                        \
-            }                                                                                      \
-            ||                                                                                     \
+            !requires { std::forward<T>(value).MEMBER(std::forward<Args>(args)...); } ||           \
             requires {                                                                             \
                 requires(noexcept(std::forward<T>(value).MEMBER(std::forward<Args>(args)...)));    \
             }                                                                                      \
         )                                                                                          \
         -> decltype(auto)                                                                          \
+        requires requires { std::forward<T>(value).MEMBER(std::forward<Args>(args)...); } ||       \
+                 requires { std::forward<T>(value).MEMBER; }                                       \
     {                                                                                              \
         constexpr bool is_method = requires {                                                      \
-            /* FIXME?: if `MEMBER` is a niebloid, it'd behave not as one may expect */             \
             std::forward<T>(value).MEMBER(std::forward<Args>(args)...);                            \
         };                                                                                         \
                                                                                                    \
@@ -462,7 +469,7 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
         } else {                                                                                   \
             static_assert(                                                                         \
                 false,                                                                             \
-                "`" #MEMBER "` is not a field or it cannot be invoked with this set of arguments"  \
+                "Must be unreachable (`" #MEMBER "`)"                                              \
             );                                                                                     \
         }                                                                                          \
     }
