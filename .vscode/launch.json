@@ -8,7 +8,8 @@
             "program": "${workspaceFolder}/bin/toy.exe",
             "args": "",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "Build"
+            "preLaunchTask": "Build",
+            "console": "integratedTerminal"
         },
         {
             "type": "lldb-dap",
