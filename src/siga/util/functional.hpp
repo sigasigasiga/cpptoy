@@ -11,6 +11,7 @@ class [[nodiscard]] construct_t
 {
 public:
     template<typename... Args>
+    requires std::constructible_from<T, Args &&...>
     [[nodiscard]] static constexpr T operator()(Args &&...args)
         noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
     {
@@ -23,6 +24,7 @@ class [[nodiscard]] construct_t<T, false>
 {
 public:
     template<typename... Args>
+    requires requires(Args &&...args) { T{std::forward<Args>(args)...}; }
     [[nodiscard]] static constexpr T operator()(Args &&...args)
         noexcept(noexcept(T{std::forward<Args>(args)...}))
     {
@@ -35,10 +37,99 @@ inline constexpr construct_t<T, UseRoundBrackets> construct;
 
 // -------------------------------------------------------------------------------------------------
 
+template<typename To>
+class [[nodiscard]] static_value_cast_t
+{
+public:
+    template<typename From>
+    requires requires(From &&from) { static_cast<To>(std::forward<From>(from)); }
+    [[nodiscard]] static constexpr To operator()(From &&from)
+        noexcept(noexcept(static_cast<To>(std::forward<From>(from))))
+    {
+        return static_cast<To>(std::forward<From>(from));
+    }
+};
+
+template<typename To>
+inline constexpr static_value_cast_t<To> static_value_cast;
+
+// -------------------------------------------------------------------------------------------------
+
+template<typename To>
+class [[nodiscard]] dynamic_value_cast_t
+{
+public:
+    template<typename From>
+    requires requires(From &&from) { dynamic_cast<To>(std::forward<From>(from)); }
+    [[nodiscard]] static constexpr To operator()(From &&from)
+        noexcept(noexcept(dynamic_cast<To>(std::forward<From>(from))))
+    {
+        return dynamic_cast<To>(std::forward<From>(from));
+    }
+};
+
+template<typename To>
+inline constexpr dynamic_value_cast_t<To> dynamic_value_cast;
+
+// -------------------------------------------------------------------------------------------------
+
+template<typename To>
+class [[nodiscard]] const_value_cast_t
+{
+public:
+    template<typename From>
+    requires requires(From &&from) { const_cast<To>(std::forward<From>(from)); }
+    [[nodiscard]] static constexpr To operator()(From &&from) noexcept
+    {
+        return const_cast<To>(std::forward<From>(from));
+    }
+};
+
+template<typename To>
+inline constexpr const_value_cast_t<To> const_value_cast;
+
+// -------------------------------------------------------------------------------------------------
+
+template<typename To>
+class [[nodiscard]] reinterpret_value_cast_t
+{
+public:
+    template<typename From>
+    requires requires(From &&from) { reinterpret_cast<To>(std::forward<From>(from)); }
+    [[nodiscard]] static constexpr To operator()(From &&from) noexcept
+    {
+        return reinterpret_cast<To>(std::forward<From>(from));
+    }
+};
+
+template<typename To>
+inline constexpr reinterpret_value_cast_t<To> reinterpret_value_cast;
+
+// -------------------------------------------------------------------------------------------------
+
+template<typename To>
+class [[nodiscard]] c_style_cast_t
+{
+public:
+    template<typename From>
+    requires requires(From &&from) { (To) std::forward<From>(from); }
+    [[nodiscard]] static constexpr To operator()(From &&from)
+        noexcept(noexcept((To)std::forward<From>(from)))
+    {
+        return (To)std::forward<From>(from);
+    }
+};
+
+template<typename To>
+inline constexpr c_style_cast_t<To> c_style_cast;
+
+// -------------------------------------------------------------------------------------------------
+
 class [[nodiscard]] indirect_t
 {
 public:
     template<typename T>
+    requires requires(T &&object) { *std::forward<T>(object); }
     [[nodiscard]] static constexpr decltype(auto) operator()(T &&object)
         noexcept(noexcept(*std::forward<T>(object)))
     {
@@ -129,6 +220,12 @@ public:
 public:
     // clang-format off
     template<typename Self, typename... Args>
+    requires requires(Self &&self, Args &&...args) {
+        std::invoke(
+            std::forward<Self>(self).fn_,
+            get_reference(std::forward<Args>(args))...
+        );
+    }
     constexpr decltype(auto) operator()(this Self &&self, Args &&...args)
         noexcept(noexcept(std::invoke(
             std::forward<Self>(self).fn_,
@@ -152,6 +249,7 @@ class [[nodiscard]] subscript
 {
 public:
     template<typename L, typename R>
+    requires requires(L &&lhs, R &&rhs) { std::forward<L>(lhs)[std::forward<R>(rhs)]; }
     [[nodiscard]] static constexpr decltype(auto) operator()(L &&lhs, R &&rhs)
         noexcept(noexcept(std::forward<L>(lhs)[std::forward<R>(rhs)]))
     {
@@ -208,8 +306,9 @@ public:
 
 public:
     template<typename Self>
+    requires requires(Self &&self) { std::invoke(std::forward<Self>(self).func_); }
     constexpr decltype(auto) operator()(this Self &&self, auto &&...)
-        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>>)
+        noexcept(noexcept(std::invoke(std::forward<Self>(self).func_)))
     {
         return std::invoke(std::forward<Self>(self).func_);
     }
@@ -351,6 +450,7 @@ class [[nodiscard]] typed_get
 {
 public:
     template<typename Gettable>
+    requires requires(Gettable &&gettable) { get<T>(std::forward<Gettable>(gettable)); }
     [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
         noexcept(noexcept(get<T>(std::declval<Gettable>())))
     {
@@ -363,6 +463,7 @@ class [[nodiscard]] valued_get
 {
 public:
     template<typename Gettable>
+    requires requires(Gettable &&gettable) { get<V>(std::forward<Gettable>(gettable)); }
     [[nodiscard]] static constexpr decltype(auto) operator()(Gettable &&gettable)
         noexcept(noexcept(get<V>(std::declval<Gettable>())))
     {
