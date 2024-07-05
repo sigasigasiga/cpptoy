@@ -9,7 +9,7 @@ template<typename F, typename... Args>
 [[nodiscard]] constexpr auto bind_front_unwrap(F &&f, Args &&...args)
     noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
 {
-    return std::bind_front(unwrap_args(std::forward<F>(f)), std::forward<Args>(args)...);
+    return std::bind_front(get_reference_wrap(std::forward<F>(f)), std::forward<Args>(args)...);
 }
 
 template<typename F, typename... Args>
@@ -17,7 +17,7 @@ template<typename F, typename... Args>
     noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
 {
     // TODO: use `std::bind_back` when llvm 19
-    return ranges::bind_back(unwrap_args(std::forward<F>(f)), std::forward<Args>(args)...);
+    return ranges::bind_back(get_reference_wrap(std::forward<F>(f)), std::forward<Args>(args)...);
 }
 
 // -------------------------------------------------------------------------------------------------

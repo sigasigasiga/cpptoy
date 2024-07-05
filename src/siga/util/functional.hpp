@@ -2,6 +2,7 @@
 
 #include "siga/util/meta.hpp"
 #include "siga/util/tuple.hpp"
+#include "siga/util/utility.hpp"
 
 namespace siga::util {
 
@@ -83,14 +84,14 @@ private:
     F func_;
 };
 
-// TODO: noexcept
 template<typename F, typename... Args>
 [[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args)
+    noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
 {
     if constexpr(sizeof...(args) == 0) {
-        return lazy_eval{std::forward<F>(func)};
+        return lazy_eval(std::forward<F>(func));
     } else {
-        return lazy_eval{std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)};
+        return lazy_eval(std::bind_front(std::forward<F>(func), std::forward<Args>(args)...));
     }
 }
 
@@ -117,10 +118,10 @@ inline constexpr get_reference_t get_reference;
 // -------------------------------------------------------------------------------------------------
 
 template<typename F>
-class [[nodiscard]] unwrap_args
+class [[nodiscard]] get_reference_wrap
 {
 public:
-    constexpr unwrap_args(F fn) noexcept(std::is_nothrow_move_constructible_v<F>)
+    constexpr get_reference_wrap(F fn) noexcept(std::is_nothrow_move_constructible_v<F>)
         : fn_{std::move(fn)}
     {
     }
@@ -197,10 +198,10 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template<std::invocable F>
-class [[nodiscard]] ignore_args
+class [[nodiscard]] ignore_args_wrap
 {
 public:
-    constexpr ignore_args(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
+    constexpr ignore_args_wrap(F func) noexcept(std::is_nothrow_move_constructible_v<F>)
         : func_{std::move(func)}
     {
     }
@@ -338,8 +339,7 @@ private:
 inline constexpr fold_invoke_t fold_invoke;
 
 template<typename... Fs>
-[[nodiscard]] constexpr auto compose(Fs &&...fs)
-    noexcept((... && std::is_nothrow_constructible_v<std::decay_t<Fs>, Fs &&>))
+[[nodiscard]] constexpr auto compose(Fs &&...fs) noexcept((... && is_nothrow_decay_copyable_v<Fs>))
 {
     return std::bind_front(fold_invoke, std::tuple{std::forward<Fs>(fs)...});
 }

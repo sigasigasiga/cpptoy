@@ -65,7 +65,7 @@ inline constexpr cut_rvalue_ref_t cut_rvalue_ref;
 
 // useful for `std::optional::transform`
 template<typename F>
-[[nodiscard]] constexpr auto decay_return(F &&func)
+[[nodiscard]] constexpr auto decay_copy_wrap(F &&func)
 {
     return compose(std::forward<F>(func), decay_copy);
 }
@@ -75,7 +75,7 @@ template<typename F>
 // useful for `tl::optional::transform`,
 // although i think it should replace `T&&` with `T` automatically
 template<typename F>
-[[nodiscard]] constexpr auto cut_rvalue_return(F &&func)
+[[nodiscard]] constexpr auto cut_rvalue_ref_wrap(F &&func)
 {
     return compose(std::forward<F>(func), cut_rvalue_ref);
 }
