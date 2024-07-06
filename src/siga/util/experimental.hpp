@@ -7,15 +7,26 @@ namespace siga::util {
 // Notes:
 // 1. It works on each major implementation (gcc, clang, msvc),
 //    though I'm not sure if this is even conforming.
-// 2. `template<typename = decltype(make_unique_type())> void foo()` is different from
-//    `template<typename = decltype([]{})> void foo()`:
-//    the first function will be instantiated only once,
-//    whereas the second one will be instantiated again on every new call on every compiler
-//    except MSVC https://godbolt.org/z/zrhP1oqK9
+// 2. `template<class = decltype(make_unique_type())> void f()` will be instantiated only once
+//    on every compiler except MSVC https://godbolt.org/z/zrhP1oqK9
 template<typename Unique = decltype([] {})>
 [[nodiscard]] constexpr Unique make_unique_type() noexcept;
 
 static_assert(not std::same_as<decltype(make_unique_type()), decltype(make_unique_type())>);
+
+// This typedef produces new type every time it is written.
+//
+// Notes:
+// 1. It works on each major implementation (gcc, clang, msvc)
+//    and I'm pretty much assured that this is conforming
+// 2. Because it requires to write empty angle brackets (`unique_type_t<>`)
+//    it is easier to fuck it up by writing something inside them
+// 3. `template<class = unique_type_t<>> void f()` will be instantiated again
+//     on every new call on gcc and msvc but not on clang https://godbolt.org/z/15jr5hM8W
+template<typename T = decltype([] {})>
+using unique_type_t = T;
+
+static_assert(not std::same_as<unique_type_t<>, unique_type_t<>>);
 
 // -------------------------------------------------------------------------------------------------
 
