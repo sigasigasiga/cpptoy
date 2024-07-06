@@ -32,6 +32,7 @@
 #    include <print>
 #endif
 #include <ranges>
+#include <source_location>
 #include <stdexcept>
 #include <thread>
 #include <tuple>
@@ -46,6 +47,7 @@
 
 // my includes
 #include "siga/util/bind.hpp"
+#include "siga/util/experimental.hpp"
 #include "siga/util/functional.hpp"
 #include "siga/util/iterator.hpp"
 #include "siga/util/meta.hpp"
