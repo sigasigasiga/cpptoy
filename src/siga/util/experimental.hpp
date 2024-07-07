@@ -2,8 +2,8 @@
 
 namespace siga::util {
 
-// Every call to this function returns a unique type
-//
+// https://stackoverflow.com/q/68798717/10961484
+
 // Notes:
 // 1. It works on each major implementation (gcc, clang, msvc),
 //    though I'm not sure if this is even conforming.
@@ -14,8 +14,18 @@ template<typename Unique = decltype([] {})>
 
 static_assert(not std::same_as<decltype(make_unique_type()), decltype(make_unique_type())>);
 
-// This typedef produces new type every time it is written.
-//
+// Notes:
+// 1. It works on each major implementation
+// 2. `template<auto = make_unique_value()> void f()` will be instantiated only ONCE
+//    on every compiler https://godbolt.org/z/Y9E385bnr
+template<auto V = ([] {})>
+[[nodiscard]] constexpr auto make_unique_value() noexcept
+{
+    return V;
+}
+
+static_assert(make_unique_value() != make_unique_value());
+
 // Notes:
 // 1. It works on each major implementation (gcc, clang, msvc)
 //    and I'm pretty much assured that this is conforming
@@ -28,13 +38,25 @@ using unique_type_t = T;
 
 static_assert(not std::same_as<unique_type_t<>, unique_type_t<>>);
 
+// Notes:
+// 1. It works on each major implementation (gcc, clang, msvc)
+//    and I'm pretty much assured that this is conforming
+// 2. Because it requires to write empty angle brackets (`unique_value<>`)
+//    it is easier to fuck it up by writing something inside them
+// 3. `template<auto = unique_value<>> void f()` will be instantiated again
+//     on every new use only on gcc https://godbolt.org/z/rxYPWcdsK
+template<auto V = ([] {})>
+constexpr auto unique_value = V;
+
+static_assert(unique_value<> != unique_value<>);
+
 // -------------------------------------------------------------------------------------------------
 
 // Each unique call to this function produces a unique static object,
 // thanks to the lambda-parametrized template parameter.
 //
 // This function probably doesn't have much use in practice
-template<typename T, typename = decltype([] {}), typename... Args>
+template<typename T, auto = [] {}, typename... Args>
 requires std::constructible_from<T, Args &&...>
 [[nodiscard]] constexpr T &make_static_object(Args &&...args)
     noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
@@ -47,7 +69,7 @@ requires std::constructible_from<T, Args &&...>
 
 // Each unique call to this function produces a shared pointer to a static object.
 // The way it works is similar to `make_static_object` function
-template<typename T, typename = decltype([] {}), typename... Args>
+template<typename T, auto = [] {}, typename... Args>
 requires std::constructible_from<T, Args &&...>
 [[nodiscard]] std::shared_ptr<T> make_static_shared_ptr(Args &&...args)
     noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
