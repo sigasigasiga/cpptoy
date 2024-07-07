@@ -126,7 +126,7 @@ public:
 
 std::string format_source_location(const auto &loc)
 {
-    return std::format(
+    return fmt::format(
         "{}({}:{}) `{}`",
         loc.file_name(),
         loc.line(),
