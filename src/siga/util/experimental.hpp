@@ -58,7 +58,7 @@ static_assert(unique_value<> != unique_value<>);
 // This function probably doesn't have much use in practice
 template<typename T, auto = [] {}, typename... Args>
 requires std::constructible_from<T, Args &&...>
-[[nodiscard]] constexpr T &make_static_object(Args &&...args)
+[[nodiscard]] T &make_static_object(Args &&...args)
     noexcept(std::is_nothrow_constructible_v<T, Args &&...>)
 {
     static T ret(std::forward<Args>(args)...);
