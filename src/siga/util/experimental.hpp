@@ -90,6 +90,35 @@ requires std::constructible_from<T, Args &&...>
 
 // -------------------------------------------------------------------------------------------------
 
+// Behaves like `std::invoke`, except that it expects `std::weak_ptr` as the second argument
+// and either invokes the function with underlying value or returns `Ret()`.
+//
+// It may be especially useful in asynchronous programming (e.g. with boost.asio)
+class weak_invoke_t
+{
+public:
+    // TODO: maybe we should prohibit non-`void` return types?
+    template<
+        typename Fn,
+        typename T,
+        typename... Args,
+        typename Ret = std::invoke_result_t<Fn, T &, Args...>>
+    requires std::invocable<Fn, T &, Args...> && requires { Ret(); }
+    static Ret operator()(Fn &&fn, const std::weak_ptr<T> &weak, Args &&...args)
+        noexcept(std::is_nothrow_invocable_v<Fn, T &, Args...> && noexcept(Ret()))
+    {
+        if(auto p = weak.lock()) {
+            return std::invoke(std::forward<Fn>(fn), *p, std::forward<Args>(args)...);
+        } else {
+            return Ret();
+        }
+    }
+};
+
+inline constexpr weak_invoke_t weak_invoke;
+
+// -------------------------------------------------------------------------------------------------
+
 // I thought that this struct would be useful for producing unique type,
 // but for some reason it didn't work (see `print_nttp_source_location`)
 template<std::size_t MaxStringSize = 256>
