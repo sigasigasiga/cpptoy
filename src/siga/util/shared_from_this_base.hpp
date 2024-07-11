@@ -110,6 +110,7 @@ public:
 template<typename T>
 class universal_make_shared
 {
+public:
     template<typename... Args>
     requires std::constructible_from<T, Args &&...>
     [[nodiscard]] static auto operator()(Args &&...args)
