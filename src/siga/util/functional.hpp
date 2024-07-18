@@ -519,11 +519,11 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
     []<typename... Args>(Args &&...args)                                                           \
         constexpr                                                                                  \
         static                                                                                     \
-        noexcept(noexcept(X(std::forward<Args>(args)...)))                                         \
+        noexcept(noexcept(X(::std::forward<Args>(args)...)))                                       \
         -> decltype(auto)                                                                          \
-        requires requires { X(std::forward<Args>(args)...); }                                      \
+        requires requires { X(::std::forward<Args>(args)...); }                                    \
     {                                                                                              \
-        return X(std::forward<Args>(args)...);                                                     \
+        return X(::std::forward<Args>(args)...);                                                   \
     }
 // clang-format on
 
