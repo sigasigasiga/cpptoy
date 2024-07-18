@@ -151,24 +151,11 @@ public:
     }
 
 public:
-    constexpr operator decltype(auto)() & noexcept(std::is_nothrow_invocable_v<F &>)
+    template<typename Self>
+    [[nodiscard]] constexpr operator std::invoke_result_t<copy_cv_ref_t<Self, F>>(this Self &&self)
+        noexcept(std::is_nothrow_invocable_v<copy_cv_ref_t<Self, F>>)
     {
-        return std::invoke(func_);
-    }
-
-    constexpr operator decltype(auto)() const & noexcept(std::is_nothrow_invocable_v<const F &>)
-    {
-        return std::invoke(func_);
-    }
-
-    constexpr operator decltype(auto)() && noexcept(std::is_nothrow_invocable_v<F &&>)
-    {
-        return std::invoke(std::move(func_));
-    }
-
-    constexpr operator decltype(auto)() const && noexcept(std::is_nothrow_invocable_v<const F &&>)
-    {
-        return std::invoke(std::move(func_));
+        return std::invoke(std::forward<Self>(self).func_);
     }
 
 private:
