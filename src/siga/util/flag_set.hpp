@@ -32,7 +32,13 @@ public:
 
 public:
     constexpr value_type value() const noexcept { return value_; }
-    explicit constexpr operator value_type() const noexcept { return value(); }
+
+    template<typename To>
+    requires std::same_as<To, value_type> || std::same_as<To, bool>
+    explicit constexpr operator To() const noexcept
+    {
+        return value();
+    }
 
 private:
     value_type value_;

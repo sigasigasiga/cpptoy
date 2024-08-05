@@ -48,6 +48,7 @@
 // my includes
 #include "siga/util/bind.hpp"
 #include "siga/util/experimental.hpp"
+#include "siga/util/flag_set.hpp"
 #include "siga/util/functional.hpp"
 #include "siga/util/iterator.hpp"
 #include "siga/util/meta.hpp"
