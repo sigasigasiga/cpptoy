@@ -163,8 +163,11 @@ private:
 };
 
 template<typename F, typename... Args>
-[[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args)
-    noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
+[[nodiscard]] constexpr auto lazy_eval_bind(F &&func, Args &&...args) //
+    noexcept(
+        is_nothrow_decay_copy_constructible_v<F> &&
+        (... && is_nothrow_decay_copy_constructible_v<Args>)
+    )
 {
     if constexpr(sizeof...(args) == 0) {
         return lazy_eval(std::forward<F>(func));
@@ -425,7 +428,8 @@ private:
 inline constexpr fold_invoke_t fold_invoke;
 
 template<typename... Fs>
-[[nodiscard]] constexpr auto compose(Fs &&...fs) noexcept((... && is_nothrow_decay_copyable_v<Fs>))
+[[nodiscard]] constexpr auto compose(Fs &&...fs)
+    noexcept((... && is_nothrow_decay_copy_constructible_v<Fs>))
 {
     return std::bind_front(fold_invoke, std::tuple{std::forward<Fs>(fs)...});
 }

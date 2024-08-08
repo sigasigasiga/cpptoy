@@ -6,15 +6,21 @@
 namespace siga::util {
 
 template<typename F, typename... Args>
-[[nodiscard]] constexpr auto bind_front_unwrap(F &&f, Args &&...args)
-    noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
+[[nodiscard]] constexpr auto bind_front_unwrap(F &&f, Args &&...args) //
+    noexcept(
+        is_nothrow_decay_copy_constructible_v<F> &&
+        (... && is_nothrow_decay_copy_constructible_v<Args>)
+    )
 {
     return std::bind_front(get_reference_wrap(std::forward<F>(f)), std::forward<Args>(args)...);
 }
 
 template<typename F, typename... Args>
-[[nodiscard]] constexpr auto bind_back_unwrap(F &&f, Args &&...args)
-    noexcept(is_nothrow_decay_copyable_v<F> && (... && is_nothrow_decay_copyable_v<Args>))
+[[nodiscard]] constexpr auto bind_back_unwrap(F &&f, Args &&...args) //
+    noexcept(
+        is_nothrow_decay_copy_constructible_v<F> &&
+        (... && is_nothrow_decay_copy_constructible_v<Args>)
+    )
 {
     // TODO: use `std::bind_back` when llvm 19
     return ranges::bind_back(get_reference_wrap(std::forward<F>(f)), std::forward<Args>(args)...);
