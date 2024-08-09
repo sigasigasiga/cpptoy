@@ -506,6 +506,7 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
 // -------------------------------------------------------------------------------------------------
 
 // clang-format off
+// FIXME: It cannot handle template functions with multiple template parameters
 #define SIGA_UTIL_LIFT(X)                                                                          \
     []<typename... Args>(Args &&...args)                                                           \
         constexpr                                                                                  \
@@ -528,6 +529,7 @@ class std::is_bind_expression<siga::util::make_bind_expression<F>> : public std:
 // 2. If `MEMBER` is a niebloid, it'd be called, despite the fact
 //    that `std::invoke` would return a reference to it.
 //    While this is probably fixable, I'm not sure if it's worth the effort
+// 3. FIXME: It cannot handle template functions with multiple template parameters
 // 
 // TODO: should we also specify a class name? If so, don't forget that types must be _compatible_
 #define SIGA_UTIL_LIFT_MEMBER(MEMBER) \
