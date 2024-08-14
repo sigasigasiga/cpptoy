@@ -5,6 +5,7 @@
 project('toy', 'cpp', default_options : [ 'cpp_std=c++23' ])
 
 deps = [
+  dependency('siga-util'),
   dependency('fmt'),
   dependency('range-v3'),
   dependency('tl-optional'),
@@ -12,7 +13,7 @@ deps = [
     'boost',
     # modules: ['program_options'],
     required: false
-  )
+  ),
 ]
 
 executable(

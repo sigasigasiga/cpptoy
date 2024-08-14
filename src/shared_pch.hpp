@@ -43,17 +43,5 @@
 // thirdparty
 #include <fmt/core.h>
 #include <range/v3/all.hpp>
+#include <siga/util.hpp>
 #include <tl/optional.hpp>
-
-// my includes
-#include "siga/util/bind.hpp"
-#include "siga/util/experimental.hpp"
-#include "siga/util/flag_set.hpp"
-#include "siga/util/functional.hpp"
-#include "siga/util/iterator.hpp"
-#include "siga/util/meta.hpp"
-#include "siga/util/scoped.hpp"
-#include "siga/util/shared_from_this_base.hpp"
-#include "siga/util/toy.hpp"
-#include "siga/util/tuple.hpp"
-#include "siga/util/utility.hpp"

@@ -1,0 +1,6 @@
+[submodule "dependencies/siga-util"]
+	path = dependencies/siga-util
+	url = git@github.com:sigasigasiga/util.git
+[submodule "subprojects/siga-util"]
+	path = subprojects/siga-util
+	url = git@github.com:sigasigasiga/util.git
