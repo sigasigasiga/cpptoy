@@ -1,6 +1,6 @@
 # macos cmdline
 # ```
-# CC=clang CXX=clang++ LDFLAGS="-L/opt/homebrew/opt/llvm/lib/c++ -Wl,-rpath,/opt/homebrew/opt/llvm/lib/c++" meson setup bin
+# meson setup --cross-file brew-cross.ini bin
 # ```
 project('toy', 'cpp', default_options : [ 'cpp_std=c++23' ])
 
