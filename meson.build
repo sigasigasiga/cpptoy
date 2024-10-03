@@ -11,7 +11,6 @@ deps = [
   dependency('siga-util'),
   dependency('fmt'),
   dependency('range-v3'),
-  dependency('tl-optional'),
   dependency(
     'boost',
     # modules: ['program_options'],
