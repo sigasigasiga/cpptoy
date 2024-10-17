@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "main.cpp"
 
 namespace siga {
 

@@ -20,7 +20,7 @@ deps = [
 
 executable(
   meson.project_name(),
-  sources: ['src/app.cpp'],
+  sources: ['src/app.cpp'], # `src/main.cpp` is not a source file
   include_directories: ['src/'],
   dependencies: deps,
   cpp_pch: 'src/shared_pch.hpp'
