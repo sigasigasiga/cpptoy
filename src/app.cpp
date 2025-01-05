@@ -20,7 +20,7 @@ template<auto MainFPtr>
 constexpr int adjust(int argc, const char *argv[])
 {
     constexpr bool returns_void = requires() {
-        { adjust_args<MainFPtr>(argc, argv) } -> util::conceptify<std::is_void>;
+        { adjust_args<MainFPtr>(argc, argv) } -> meta::conceptify<std::is_void>;
     };
 
     if constexpr(returns_void) {
