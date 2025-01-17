@@ -44,9 +44,11 @@
 #include <fmt/core.h>
 #include <range/v3/all.hpp>
 
+#include <siga/algo.hpp>
 #include <siga/compat.hpp>
 #include <siga/fn.hpp>
 #include <siga/iter.hpp>
 #include <siga/meta.hpp>
+#include <siga/ranges.hpp>
 #include <siga/toy.hpp>
 #include <siga/util.hpp>
