@@ -1,9 +1,3 @@
-#pragma once
-
-namespace siga {
-
-inline auto main(int argc, const char *argv[])
+int main()
 {
 }
-
-} // namespace siga
