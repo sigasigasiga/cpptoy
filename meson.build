@@ -5,7 +5,7 @@
 # 
 # build benchmark
 # meson setup -Dbenchmark=enabled bin
-project('toy', 'cpp', default_options : [ 'cpp_std=c++23' ])
+project('toy', 'cpp', default_options : [ 'cpp_std=c++26' ])
 
 deps = [
   dependency('siga-util'),
