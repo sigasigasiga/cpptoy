@@ -8,7 +8,7 @@
 project('toy', 'cpp', default_options : [ 'cpp_std=c++26' ])
 
 deps = [
-  dependency('siga-util'),
+  dependency('grace'),
   dependency('fmt'),
   dependency('range-v3'),
   dependency(
