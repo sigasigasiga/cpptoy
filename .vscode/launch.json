@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "cppvsdbg",
+            "request": "launch",
+            "name": "(vsdbg) Launch file",
+            "program": "${workspaceFolder}/build/cpptoy.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "preLaunchTask": "Build"
+        },
+        {
+            "type": "lldb-dap",
+            "request": "launch",
+            "name": "(lldb) Launch file",
+            "program": "${workspaceFolder}/build/cpptoy",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "internalConsoleOptions": "openOnSessionStart",
+            "runInTerminal": true,
+            "preLaunchTask": "Build"
+        }
+    ]
+}
