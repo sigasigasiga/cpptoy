@@ -1,3 +1,5 @@
+import std;
+
 import dummy_a;
 import dummy_b;
 
