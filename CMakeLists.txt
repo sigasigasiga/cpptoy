@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # stolen from Hana Dusikova's CTRE library
 # https://github.com/hanickadot/compile-time-regular-expressions/blob/dab09336d/CMakeLists.txt#L5-L16
