@@ -31,6 +31,8 @@ FetchContent_MakeAvailable(grace)
 
 find_package(Boost)
 
+find_package(TBB)
+
 add_subdirectory(dummy_a)
 add_subdirectory(dummy_b)
 
@@ -46,8 +48,10 @@ target_link_libraries(
     cpptoy
 
     PRIVATE
+
     dummy_a
     dummy_b
+
     grace
 )
 
@@ -56,4 +60,11 @@ if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 else()
     message(WARNING "Boost not found")
+endif()
+
+if (TBB_FOUND)
+    message(STATUS "TBB version: ${TBB_VERSION}")
+    target_link_libraries(cpptoy PRIVATE TBB::tbb)
+else()
+    message(WARNING "TBB not found")
 endif()
